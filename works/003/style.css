@@ -1,27 +1,6 @@
-
-:root {
-    --accent: #ff7b02;
-    --text: #f2f2f7;
-    --muted: #a0a0ad;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-html,
 body {
-    min-height: 100%;
-    margin: 0;
-}
-
-body {
-    overflow: hidden;
     background: #000;
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
 }
-
 #canvas {
     position: fixed;
     inset: 0;
@@ -31,12 +10,6 @@ body {
     height: 100%;
     cursor: crosshair;
     touch-action: none;
-}
-
-#siteHeader,
-#siteFooter {
-    position: relative;
-    z-index: 2;
 }
 
 .fireworks-page {
@@ -116,7 +89,6 @@ body {
 
 @media (max-width: 600px) {
     .fireworks-page {
-        min-height: calc(100vh - 140px);
         padding: 30px 20px 90px;
     }
 

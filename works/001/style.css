@@ -1,38 +1,15 @@
 
-* {
-    box-sizing: border-box;
-}
-
-html {
-    min-height: 100%;
-    background: #080b12;
-}
-
 body {
-    position: relative;
-    isolation: isolate;
-    min-height: 100vh;
-    margin: 0;
     overflow: hidden;
     color: #ffffff;
-    font-family: Arial, sans-serif;
     background:
             radial-gradient(ellipse at 50% 100%, #14233b 0%, transparent 65%),
             linear-gradient(180deg, #080b12 0%, #101b30 100%);
 }
 
-#shootCanvas {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    display: block;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    background: transparent;
-}
-
 .demo {
+    position: relative;
+    z-index: 1;
     display: flex;
     min-height: calc(100vh - 140px);
     padding: 32px 5%;
@@ -81,9 +58,46 @@ h1 {
     letter-spacing: 6px;
 }
 
+#musicButton {
+    position: relative;
+    z-index: 10;
+    display: block;
+    margin: 20px auto 0;
+    padding: 12px 24px;
+    border: 1px solid rgba(255, 123, 2, 0.7);
+    border-radius: 30px;
+    background: rgba(8, 11, 18, 0.85);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    pointer-events: auto;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+#musicButton:hover {
+    background: #ff7b02;
+    border-color: #ff7b02;
+    transform: translateY(-2px);
+}
+
+#musicButton:active {
+    transform: translateY(0);
+}
+
+#musicButton:focus-visible {
+    outline: 2px solid #ffffff;
+    outline-offset: 4px;
+}
+
 @media (max-width: 600px) {
     .demo {
         padding: 24px;
+    }
+
+    .content {
+        padding: 50px 0;
     }
 
     h1 {
@@ -93,10 +107,15 @@ h1 {
     .year {
         letter-spacing: 4px;
     }
+
+    #musicButton {
+        padding: 11px 22px;
+        font-size: 13px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    #shootCanvas {
-        display: none;
+    #musicButton {
+        transition: none;
     }
 }

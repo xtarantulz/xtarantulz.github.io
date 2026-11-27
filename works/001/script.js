@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', function () {
   const canvas = document.getElementById('shootCanvas') || document.createElement('canvas');
 
@@ -57,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initStars();
   }
 
-  // --- 1. Частицы и линии (созвездия на фоне) ---
+  // --- 1. Частицы и линии ---
   class Particle {
     constructor() {
       this.x = random(0, width);
@@ -98,10 +99,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function initParticles() {
     particles = [];
+
     const count = Math.min(
         isMobile ? 35 : 150,
         Math.floor(width * height / (isMobile ? 30000 : 22000))
     );
+
     for (let i = 0; i < count; i++) {
       particles.push(new Particle());
     }
@@ -135,7 +138,9 @@ document.addEventListener('DOMContentLoaded', function () {
   // --- 2. Снег и звёзды ---
   function initSnow() {
     snowflakes = [];
+
     const count = isMobile ? 25 : 45;
+
     for (let i = 0; i < count; i++) {
       snowflakes.push({
         x: random(0, width),
@@ -157,6 +162,7 @@ document.addEventListener('DOMContentLoaded', function () {
         snow.y = -5;
         snow.x = random(0, width);
       }
+
       if (snow.x > width + 5) snow.x = -5;
       if (snow.x < -5) snow.x = width + 5;
 
@@ -172,7 +178,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function initStars() {
     stars = [];
+
     const count = isMobile ? 12 : 24;
+
     for (let i = 0; i < count; i++) {
       stars.push({
         x: random(0, width),
@@ -194,12 +202,14 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.shadowColor = '#ffffff';
 
     ctx.beginPath();
+
     for (let i = 0; i < 4; i++) {
       ctx.rotate(Math.PI / 2);
       ctx.moveTo(0, 0);
       ctx.quadraticCurveTo(size * 0.15, size * 0.15, 0, size * 2.5);
       ctx.quadraticCurveTo(-size * 0.15, size * 0.15, 0, 0);
     }
+
     ctx.fill();
     ctx.restore();
   }
@@ -207,6 +217,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function drawStars() {
     stars.forEach(star => {
       star.alpha += star.direction * 0.004;
+
       if (star.alpha > 0.95 || star.alpha < 0.15) {
         star.direction *= -1;
       }
@@ -219,6 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.fillStyle = '#ffffff';
         ctx.shadowBlur = 8;
         ctx.shadowColor = '#ffffff';
+
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -235,10 +247,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     reset() {
       const fromLeft = Math.random() > 0.5;
+
       this.x = fromLeft ? -50 : width + 50;
       this.y = random(20, height * 0.55);
+
       const speed = random(1, 4);
-      const angle = fromLeft ? random(0.2, 0.5) : Math.PI - random(0.2, 0.5);
+      const angle = fromLeft
+          ? random(0.2, 0.5)
+          : Math.PI - random(0.2, 0.5);
 
       this.vx = Math.cos(angle) * speed;
       this.vy = Math.sin(angle) * speed;
@@ -253,7 +269,11 @@ document.addEventListener('DOMContentLoaded', function () {
       this.x += this.vx;
       this.y += this.vy;
 
-      if (this.x < -200 || this.x > width + 200 || this.y > height + 200) {
+      if (
+          this.x < -200 ||
+          this.x > width + 200 ||
+          this.y > height + 200
+      ) {
         this.dead = true;
       }
     }
@@ -264,7 +284,11 @@ document.addEventListener('DOMContentLoaded', function () {
       const tailY = this.y - (this.vy / speed) * this.length;
 
       ctx.save();
-      const grad = ctx.createLinearGradient(this.x, this.y, tailX, tailY);
+
+      const grad = ctx.createLinearGradient(
+          this.x, this.y, tailX, tailY
+      );
+
       grad.addColorStop(0, '#ffffff');
       grad.addColorStop(0.2, this.color);
       grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
@@ -280,11 +304,11 @@ document.addEventListener('DOMContentLoaded', function () {
       ctx.lineTo(tailX, tailY);
       ctx.stroke();
 
-      // Яркая голова кометы
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size * 0.9, 0, Math.PI * 2);
       ctx.fill();
+
       ctx.restore();
     }
   }
@@ -292,12 +316,13 @@ document.addEventListener('DOMContentLoaded', function () {
   function updateAndDrawComets(timestamp) {
     if (timestamp > nextCometTime) {
       comets.push(new Comet());
-      nextCometTime = timestamp + random(2500, 6000); // новая комета каждые 2.5–6 сек
+      nextCometTime = timestamp + random(2500, 6000);
     }
 
     for (let i = comets.length - 1; i >= 0; i--) {
       comets[i].update();
       comets[i].draw();
+
       if (comets[i].dead) {
         comets.splice(i, 1);
       }
@@ -311,11 +336,13 @@ document.addEventListener('DOMContentLoaded', function () {
       this.y = random(height * 0.12, height * 0.45);
       this.color = cometColors[Math.floor(Math.random() * cometColors.length)];
       this.sparks = [];
+
       const count = isMobile ? 24 : 42;
 
       for (let i = 0; i < count; i++) {
         const angle = (Math.PI * 2 / count) * i + random(-0.1, 0.1);
         const speed = random(1.2, 3.8);
+
         this.sparks.push({
           x: this.x,
           y: this.y,
@@ -329,25 +356,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     updateAndDraw() {
       let alive = false;
+
       this.sparks.forEach(s => {
         if (s.alpha <= 0) return;
+
         alive = true;
+
         s.x += s.vx;
         s.y += s.vy;
-        s.vy += 0.03; // лёгкая гравитация
+        s.vy += 0.03;
         s.vx *= 0.98;
         s.vy *= 0.98;
         s.alpha -= s.decay;
+
         ctx.save();
         ctx.globalAlpha = Math.max(0, s.alpha);
         ctx.fillStyle = this.color;
         ctx.shadowBlur = 8;
         ctx.shadowColor = this.color;
+
         ctx.beginPath();
         ctx.arc(s.x, s.y, 2, 0, Math.PI * 2);
         ctx.fill();
+
         ctx.restore();
       });
+
       return alive;
     }
   }
@@ -355,8 +389,9 @@ document.addEventListener('DOMContentLoaded', function () {
   function updateAndDrawFireworks(timestamp) {
     if (timestamp > nextFireworkTime) {
       fireworks.push(new Firework());
-      nextFireworkTime = timestamp + random(4000, 9000); // салют каждые 4–9 сек
+      nextFireworkTime = timestamp + random(4000, 9000);
     }
+
     for (let i = fireworks.length - 1; i >= 0; i--) {
       if (!fireworks[i].updateAndDraw()) {
         fireworks.splice(i, 1);
@@ -364,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-// --- 5. Полумесяц и упряжка Санты ---
+  // --- 5. Полумесяц и упряжка Санты ---
   function drawMoon() {
     const moonX = width / 2;
     const moonY = (isMobile ? 85 : 120) + 30;
@@ -410,7 +445,8 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.strokeStyle = '#080b12';
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-// Тело и шея
+
+    // Тело и шея
     ctx.beginPath();
     ctx.moveTo(-14, 2);
     ctx.quadraticCurveTo(-5, -4, 6, -3);
@@ -420,23 +456,27 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.quadraticCurveTo(5, 6, -12, 5);
     ctx.closePath();
     ctx.fill();
-// Голова
+
+    // Голова
     ctx.beginPath();
     ctx.ellipse(16, -15, 5, 2.8, -0.2, 0, Math.PI * 2);
     ctx.fill();
-// Ухо
+
+    // Ухо
     ctx.beginPath();
     ctx.moveTo(13, -17);
     ctx.lineTo(10, -21);
     ctx.lineTo(14, -18);
     ctx.fill();
-// Хвост
+
+    // Хвост
     ctx.beginPath();
     ctx.moveTo(-14, 1);
     ctx.lineTo(-18, -2);
     ctx.lineTo(-14, 4);
     ctx.fill();
-// Ветвистые рога
+
+    // Ветвистые рога
     ctx.lineWidth = 1.3;
     ctx.beginPath();
     ctx.moveTo(14, -17);
@@ -446,7 +486,8 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.moveTo(9, -25);
     ctx.lineTo(7, -23);
     ctx.stroke();
-// Передние ноги
+
+    // Передние ноги
     ctx.lineWidth = 2.1;
     ctx.beginPath();
     ctx.moveTo(10, 1);
@@ -456,7 +497,8 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.lineTo(14, 8);
     ctx.lineTo(19, 10);
     ctx.stroke();
-// Задние ноги
+
+    // Задние ноги
     ctx.beginPath();
     ctx.moveTo(-11, 3);
     ctx.lineTo(-19, 9);
@@ -465,12 +507,14 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.lineTo(-15, 11);
     ctx.lineTo(-20, 14);
     ctx.stroke();
+
     ctx.restore();
   }
 
   function drawSantaSleigh(timestamp, moon) {
     const scale = isMobile ? 0.55 : 0.92;
     const bob = Math.sin(timestamp * 0.002) * 2.5;
+
     ctx.save();
     ctx.translate(moon.x - 15 * scale, moon.y + 5 * scale + bob);
     ctx.scale(scale, scale);
@@ -478,17 +522,20 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.strokeStyle = '#080b12';
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
-// Сани с полозьями
+
+    // Сани с полозьями
     ctx.save();
     ctx.translate(-88, 28);
     ctx.rotate(-0.24);
     ctx.lineWidth = 2.6;
+
     ctx.beginPath();
     ctx.moveTo(-36, 12);
     ctx.lineTo(26, 12);
     ctx.bezierCurveTo(37, 12, 39, 1, 31, 1);
     ctx.bezierCurveTo(27, 1, 27, 6, 31, 6);
     ctx.stroke();
+
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(-22, 12);
@@ -496,6 +543,7 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.moveTo(12, 12);
     ctx.lineTo(10, 5);
     ctx.stroke();
+
     ctx.beginPath();
     ctx.moveTo(-32, -12);
     ctx.quadraticCurveTo(-22, -10, -14, -3);
@@ -506,31 +554,38 @@ document.addEventListener('DOMContentLoaded', function () {
     ctx.quadraticCurveTo(-33, 4, -32, -12);
     ctx.closePath();
     ctx.fill();
-// Мешок с подарками
+
+    // Мешок с подарками
     ctx.beginPath();
     ctx.arc(-18, -11, 9, 0, Math.PI * 2);
     ctx.fill();
-// Силуэт Санты
+
+    // Силуэт Санты
     ctx.beginPath();
     ctx.arc(-3, -11, 7, 0, Math.PI * 2);
     ctx.arc(-1, -20, 4.2, 0, Math.PI * 2);
     ctx.fill();
+
     ctx.beginPath();
     ctx.moveTo(-5, -21);
     ctx.lineTo(3, -21);
     ctx.lineTo(-7, -28);
     ctx.closePath();
     ctx.fill();
+
     ctx.beginPath();
     ctx.arc(-8, -28, 2, 0, Math.PI * 2);
     ctx.fill();
+
     ctx.lineWidth = 2.5;
     ctx.beginPath();
     ctx.moveTo(1, -13);
     ctx.lineTo(11, -15);
     ctx.stroke();
+
     ctx.restore();
-// 5 оленей по восходящей дуге
+
+    // 5 оленей по восходящей дуге
     const reindeerList = [
       {x: -24, y: 12, angle: -0.32, phase: 0},
       {x: 18, y: -2, angle: -0.26, phase: 0.8},
@@ -538,46 +593,66 @@ document.addEventListener('DOMContentLoaded', function () {
       {x: 102, y: -22, angle: -0.14, phase: 2.4},
       {x: 144, y: -26, angle: -0.08, phase: 3.2}
     ];
-// Вожжи
+
+    // Вожжи
     ctx.lineWidth = 1.1;
     ctx.beginPath();
     ctx.moveTo(-66, 13);
+
     reindeerList.forEach(r => {
       const gallopY = Math.sin(timestamp * 0.005 + r.phase) * 1.8;
       ctx.lineTo(r.x - 4, r.y + gallopY - 2);
     });
+
     ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(-63, 18);
+
     reindeerList.forEach(r => {
       const gallopY = Math.sin(timestamp * 0.005 + r.phase) * 1.8;
       ctx.lineTo(r.x - 2, r.y + gallopY + 2);
     });
+
     ctx.stroke();
+
     reindeerList.forEach(r => {
       const gallopY = Math.sin(timestamp * 0.005 + r.phase) * 1.8;
-      drawReindeerSilhouette(r.x, r.y + gallopY, 0.85, 0.85, r.angle);
+
+      drawReindeerSilhouette(
+          r.x,
+          r.y + gallopY,
+          0.85,
+          0.85,
+          r.angle
+      );
     });
+
     drawSparkleStar(-35, -35, 3.2, 0.9);
     drawSparkleStar(30, 38, 2.8, 0.85);
     drawSparkleStar(115, -42, 2.5, 0.8);
+
     ctx.restore();
   }
 
-// --- Главный цикл анимации ---
+  // --- Главный цикл анимации ---
   function animate(timestamp) {
     ctx.clearRect(0, 0, width, height);
+
     drawStars();
     drawSnow();
     drawLines();
+
     particles.forEach(p => {
       p.update();
       p.draw();
     });
+
     updateAndDrawComets(timestamp);
     updateAndDrawFireworks(timestamp);
+
     const moon = drawMoon();
     drawSantaSleigh(timestamp, moon);
+
     animationId = requestAnimationFrame(animate);
   }
 

@@ -1,27 +1,4 @@
 
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    min-height: 100%;
-    margin: 0;
-}
-
-body {
-    overflow: hidden;
-    background: #050711;
-    color: #f2f2f7;
-    font-family: 'DM Sans', sans-serif;
-}
-
-#siteHeader,
-#siteFooter {
-    position: relative;
-    z-index: 5;
-}
-
 .solar-scene {
     position: relative;
     min-height: calc(100vh - 140px);
@@ -51,7 +28,7 @@ body {
 }
 
 .section-label {
-    color: #ff7b02;
+    color: var(--accent);
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 2.5px;
@@ -66,7 +43,7 @@ body {
 }
 
 .scene-title h1 span {
-    color: #ff7b02;
+    color: var(--accent);
 }
 
 .scene-title p {
@@ -90,7 +67,7 @@ body {
 }
 
 .info-label {
-    color: #ff7b02;
+    color: var(--accent);
     font-size: 9px;
     font-weight: 700;
     letter-spacing: 2px;
@@ -155,8 +132,8 @@ body {
 }
 
 .scene-controls button:hover {
-    border-color: #ff7b02;
-    color: #ff7b02;
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 .planet-list {
@@ -186,16 +163,12 @@ body {
 
 .planet-list button:hover,
 .planet-list button.active {
-    border-color: #ff7b02;
+    border-color: var(--accent);
     background: rgba(255, 123, 2, .12);
-    color: #ff9b43;
+    color: var(--accent-hover);
 }
 
 @media (max-width: 700px) {
-    .solar-scene {
-        min-height: calc(100vh - 140px);
-    }
-
     .scene-title {
         top: 22px;
         left: 18px;

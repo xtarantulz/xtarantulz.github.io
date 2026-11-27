@@ -3,14 +3,14 @@ class Particles {
   constructor() {
     this.colors = [
       '255, 255, 255',
-      '255, 99, 71',
-      '19, 19, 19'
+      '255, 123, 2',
+      '255, 99, 71'
     ];
 
     this.minRadius = 10;
     this.maxRadius = 35;
 
-    this.minOpacity = 0.005;
+    this.minOpacity = 0.05;
     this.maxOpacity = 0.5;
 
     this.minSpeed = 0.05;
@@ -85,21 +85,11 @@ class Particles {
     };
   }
 
+
   draw(particle) {
     const ctx = this.ctx;
 
-    const gradient = ctx.createRadialGradient(
-        particle.x,
-        particle.y,
-        0,
-        particle.x,
-        particle.y,
-        particle.radius
-    );
-
-    gradient.addColorStop(0, particle.color);
-    gradient.addColorStop(1, 'rgba(34, 34, 34, 0)');
-
+    // Контур пузырька
     ctx.beginPath();
     ctx.arc(
         particle.x,
@@ -109,9 +99,29 @@ class Particles {
         Math.PI * 2
     );
 
-    ctx.fillStyle = gradient;
+    // Полупрозрачная заливка
+    ctx.fillStyle = particle.color;
+    ctx.fill();
+
+    // Чёткая светлая обводка
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Небольшой блик
+    ctx.beginPath();
+    ctx.arc(
+        particle.x - particle.radius * 0.3,
+        particle.y - particle.radius * 0.3,
+        particle.radius * 0.12,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
     ctx.fill();
   }
+
 
   update(particle) {
     particle.x += particle.vx;

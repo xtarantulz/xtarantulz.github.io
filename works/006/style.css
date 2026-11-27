@@ -1,19 +1,3 @@
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    min-height: 100%;
-    margin: 0;
-}
-
-body {
-    overflow: hidden;
-    background: #000;
-    color: #d8ffe0;
-    font-family: 'DM Sans', sans-serif;
-}
 
 #matrixCanvas {
     position: fixed;
@@ -22,12 +6,6 @@ body {
     display: block;
     width: 100%;
     height: 100%;
-}
-
-#siteHeader,
-#siteFooter {
-    position: relative;
-    z-index: 2;
 }
 
 .matrix-page {
