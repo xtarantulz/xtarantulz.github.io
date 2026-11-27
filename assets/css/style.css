@@ -96,6 +96,8 @@ a {
   letter-spacing: 2px;
 }
 
+/* Фільтри */
+
 .toolbar {
   display: flex;
   align-items: center;
@@ -150,11 +152,15 @@ a {
   color: var(--accent-hover);
 }
 
+/* Інформація каталогу */
+
 .catalog-info {
   margin-bottom: 18px;
   color: var(--muted);
   font-size: 12px;
 }
+
+/* Картки робіт */
 
 .works-grid {
   display: grid;
@@ -168,7 +174,10 @@ a {
   border: 1px solid var(--border);
   border-radius: 13px;
   background: var(--surface);
-  transition: border-color 0.25s, transform 0.25s, background 0.25s;
+  transition:
+          border-color 0.25s,
+          transform 0.25s,
+          background 0.25s;
 }
 
 .work-card:hover {
@@ -197,6 +206,21 @@ a {
 
 .work-card:hover .work-preview img {
   transform: scale(1.04);
+}
+
+.work-preview iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.work-preview iframe.loaded {
+  opacity: 1;
 }
 
 .preview-placeholder {
@@ -266,6 +290,8 @@ a {
   font-size: 10px;
 }
 
+/* Порожній стан */
+
 .empty-state {
   padding: 70px 20px;
   text-align: center;
@@ -285,6 +311,8 @@ a {
 .empty-state span {
   color: var(--muted);
 }
+
+/* Адаптивність */
 
 @media (max-width: 1000px) {
   .works-grid {
@@ -328,26 +356,4 @@ a {
   .work-preview {
     aspect-ratio: 16 / 9;
   }
-}
-
-.work-preview {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 16 / 10;
-  background: #050505;
-}
-
-.work-preview iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.work-preview iframe.loaded {
-  opacity: 1;
 }
