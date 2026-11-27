@@ -1,15 +1,14 @@
-
-import { CONFIG } from './config.js';
-import { canMoveTo } from './collision.js';
-import { fireEnemyBullet } from './bullets.js';
-import { addTrack } from './effects.js';
+import {CONFIG} from './config.js';
+import {canMoveTo} from './collision.js';
+import {fireEnemyBullet} from './bullets.js';
+import {addTrack} from './effects.js';
 
 const ENEMY_SIZE = CONFIG.enemies.size;
 
 const SPAWN_POSITIONS = [
-    { x: 3, y: 3 },
-    { x: CONFIG.canvas.width / 2 - ENEMY_SIZE / 2, y: 3 },
-    { x: CONFIG.canvas.width - ENEMY_SIZE - 3, y: 3 }
+    {x: 1, y: 1},
+    {x: CONFIG.canvas.width / 2 - ENEMY_SIZE / 2, y: 1},
+    {x: CONFIG.canvas.width - ENEMY_SIZE - 1, y: 1}
 ];
 
 const DIRECTIONS = ['up', 'right', 'down', 'left'];
@@ -19,6 +18,7 @@ const ENEMY_TYPES = {
         name: 'basic',
         width: 14,
         height: 14,
+        visualScale: 1,
         speed: 1,
         health: 1,
         score: 100,
@@ -36,6 +36,7 @@ const ENEMY_TYPES = {
         name: 'fast',
         width: 12,
         height: 12,
+        visualScale: 1,
         speed: 2.2,
         health: 1,
         score: 200,
@@ -51,8 +52,9 @@ const ENEMY_TYPES = {
 
     power: {
         name: 'power',
-        width: 16,
-        height: 16,
+        width: 14,
+        height: 14,
+        visualScale: 1.12,
         speed: 1.3,
         health: 1,
         score: 300,
@@ -68,8 +70,9 @@ const ENEMY_TYPES = {
 
     armored: {
         name: 'armored',
-        width: 16,
-        height: 16,
+        width: 14,
+        height: 14,
+        visualScale: 1.14,
         speed: 0.8,
         health: 4,
         score: 400,
@@ -85,10 +88,10 @@ const ENEMY_TYPES = {
 };
 
 const ENEMY_TYPE_WEIGHTS = [
-    { type: 'basic', weight: 45 },
-    { type: 'fast', weight: 25 },
-    { type: 'power', weight: 20 },
-    { type: 'armored', weight: 10 }
+    {type: 'basic', weight: 45},
+    {type: 'fast', weight: 25},
+    {type: 'power', weight: 20},
+    {type: 'armored', weight: 10}
 ];
 
 let enemies = [];
@@ -107,7 +110,7 @@ export function getEnemies() {
     return enemies;
 }
 
-export function updateEnemies(deltaTime) {
+export function updateEnemies(deltaTime, player = null) {
     if (spawnedCount < CONFIG.enemies.total) {
         spawnTimer += deltaTime;
 
@@ -115,14 +118,14 @@ export function updateEnemies(deltaTime) {
             spawnTimer >= CONFIG.enemies.spawnInterval &&
             enemies.length < CONFIG.enemies.maxOnScreen
         ) {
-            if (spawnEnemy()) {
+            if (spawnEnemy(player)) {
                 spawnTimer = 0;
             }
         }
     }
 
     enemies.forEach(enemy => {
-        updateEnemy(enemy, deltaTime);
+        updateEnemy(enemy, deltaTime, player);
     });
 }
 
@@ -145,7 +148,7 @@ function getRandomEnemyType() {
     return ENEMY_TYPES.basic;
 }
 
-function spawnEnemy() {
+function spawnEnemy(player = null) {
     if (
         enemies.length >= CONFIG.enemies.maxOnScreen ||
         spawnedCount >= CONFIG.enemies.total
@@ -163,13 +166,14 @@ function spawnEnemy() {
         const y = position.y;
 
         if (!canMoveTo(x, y, type.width, type.height)) continue;
-        if (hasEnemyCollision(x, y, type.width, type.height)) continue;
+        if (hasTankCollision(x, y, type.width, type.height, null, player)) continue;
 
         enemies.push({
             x,
             y,
             width: type.width,
             height: type.height,
+            visualScale: type.visualScale,
 
             type: type.name,
             speed: type.speed,
@@ -193,29 +197,20 @@ function spawnEnemy() {
     return false;
 }
 
-function updateEnemy(enemy, deltaTime) {
+function updateEnemy(enemy, deltaTime, player = null) {
     enemy.turnTimer -= deltaTime;
 
     if (enemy.turnTimer <= 0) {
-        changeDirection(enemy);
+        changeDirection(enemy, player);
         enemy.turnTimer = randomTurnTime();
     }
 
     const movement = enemy.speed * (deltaTime / (1000 / 60));
-    const nextPosition = getNextPosition(enemy, movement);
+    const resolved = resolveEnemyStep(enemy, movement, player);
 
-    if (
-        canMoveTo(nextPosition.x, nextPosition.y, enemy.width, enemy.height) &&
-        !hasEnemyCollision(
-            nextPosition.x,
-            nextPosition.y,
-            enemy.width,
-            enemy.height,
-            enemy
-        )
-    ) {
-        enemy.x = nextPosition.x;
-        enemy.y = nextPosition.y;
+    if (resolved) {
+        enemy.x = resolved.x;
+        enemy.y = resolved.y;
 
         addTrack(
             enemy.x + enemy.width / 2,
@@ -223,7 +218,7 @@ function updateEnemy(enemy, deltaTime) {
             enemy.direction
         );
     } else {
-        changeDirection(enemy);
+        changeDirection(enemy, player);
         enemy.turnTimer = randomTurnTime();
     }
 
@@ -235,8 +230,39 @@ function updateEnemy(enemy, deltaTime) {
     }
 }
 
+function resolveEnemyStep(enemy, movement, player) {
+    const nextPosition = getNextPosition(enemy, movement);
+
+    if (isFreeForEnemy(nextPosition.x, nextPosition.y, enemy, player)) {
+        return nextPosition;
+    }
+
+    // М'яке огинання кутів перешкод
+    const isVertical = enemy.direction === 'up' || enemy.direction === 'down';
+    const offsets = [1, -1, 2, -2, 3, -3];
+
+    for (const offset of offsets) {
+        const testX = isVertical ? enemy.x + offset : nextPosition.x;
+        const testY = isVertical ? nextPosition.y : enemy.y + offset;
+
+        if (isFreeForEnemy(testX, testY, enemy, player)) {
+            return {x: testX, y: testY};
+        }
+    }
+
+    return null;
+}
+
+function isFreeForEnemy(nextX, nextY, enemy, player) {
+    if (!canMoveTo(nextX, nextY, enemy.width, enemy.height)) {
+        return false;
+    }
+
+    return !hasTankCollision(nextX, nextY, enemy.width, enemy.height, enemy, player);
+}
+
 function getNextPosition(enemy, movement) {
-    const position = { x: enemy.x, y: enemy.y };
+    const position = {x: enemy.x, y: enemy.y};
 
     switch (enemy.direction) {
         case 'up':
@@ -259,7 +285,7 @@ function getNextPosition(enemy, movement) {
     return position;
 }
 
-function changeDirection(enemy) {
+function changeDirection(enemy, player = null) {
     const availableDirections = DIRECTIONS.filter(
         direction => direction !== enemy.direction
     );
@@ -271,18 +297,9 @@ function changeDirection(enemy) {
     for (const direction of shuffledDirections) {
         enemy.direction = direction;
 
-        const position = getNextPosition(enemy, 1);
+        const position = getNextPosition(enemy, 1.5);
 
-        if (
-            canMoveTo(position.x, position.y, enemy.width, enemy.height) &&
-            !hasEnemyCollision(
-                position.x,
-                position.y,
-                enemy.width,
-                enemy.height,
-                enemy
-            )
-        ) {
+        if (isFreeForEnemy(position.x, position.y, enemy, player)) {
             return;
         }
     }
@@ -292,22 +309,54 @@ function changeDirection(enemy) {
         ];
 }
 
-function hasEnemyCollision(
-    x,
-    y,
+function hasTankCollision(
+    nextX,
+    nextY,
     width,
     height,
-    currentEnemy = null
+    currentEnemy = null,
+    player = null
 ) {
-    return enemies.some(enemy => {
-        if (enemy === currentEnemy) return false;
+    const targets = player ? [...enemies, player] : enemies;
 
-        return (
-            x < enemy.x + enemy.width &&
-            x + width > enemy.x &&
-            y < enemy.y + enemy.height &&
-            y + height > enemy.y
+    return targets.some(other => {
+        if (!other || other === currentEnemy) return false;
+
+        const overlapsNext = (
+            nextX < other.x + other.width &&
+            nextX + width > other.x &&
+            nextY < other.y + other.height &&
+            nextY + height > other.y
         );
+
+        if (!overlapsNext) return false;
+
+        // Якщо танки вже торкнулися — дозволяємо крок на збільшення дистанції
+        if (currentEnemy) {
+            const alreadyOverlapping = (
+                currentEnemy.x < other.x + other.width &&
+                currentEnemy.x + currentEnemy.width > other.x &&
+                currentEnemy.y < other.y + other.height &&
+                currentEnemy.y + currentEnemy.height > other.y
+            );
+
+            if (alreadyOverlapping) {
+                const curDist = Math.hypot(
+                    (currentEnemy.x + width / 2) - (other.x + other.width / 2),
+                    (currentEnemy.y + height / 2) - (other.y + other.height / 2)
+                );
+                const nextDist = Math.hypot(
+                    (nextX + width / 2) - (other.x + other.width / 2),
+                    (nextY + height / 2) - (other.y + other.height / 2)
+                );
+
+                if (nextDist > curDist) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     });
 }
 
@@ -321,192 +370,104 @@ function randomFireTime(multiplier = 1) {
         (0.6 + Math.random() * 0.8);
 }
 
+function getEnemyColors(enemy) {
+    if (enemy.type !== 'armored') {
+        return enemy.colors;
+    }
+
+    // Візуальна індикація пошкодження броні у важкого танка
+    if (enemy.health === 3) {
+        return {...enemy.colors, light: '#81ecec', main: '#00cec9', dark: '#006266'};
+    }
+    if (enemy.health === 2) {
+        return {...enemy.colors, light: '#ffeaa7', main: '#fdcb6e', dark: '#b7791f'};
+    }
+    if (enemy.health === 1) {
+        return {...enemy.colors, light: '#ff7675', main: '#d63031', dark: '#7f1414'};
+    }
+
+    return enemy.colors;
+}
+
 export function drawEnemies(ctx, timestamp = 0) {
     enemies.forEach(enemy => drawEnemy(ctx, enemy, timestamp));
 }
 
 function drawEnemy(ctx, enemy, timestamp = 0) {
-    const { x, y, width, height, direction } = enemy;
+    const {x, y, width, height, direction} = enemy;
 
-    const scaleX = width / 14;
-    const scaleY = height / 14;
+    const scaleX = (width / 14) * (enemy.visualScale || 1);
+    const scaleY = (height / 14) * (enemy.visualScale || 1);
 
     const colors = getEnemyColors(enemy);
 
     ctx.save();
-
     ctx.translate(x + width / 2, y + height / 2);
-
     const rotations = {
         up: 0,
         right: Math.PI / 2,
         down: Math.PI,
         left: -Math.PI / 2
     };
-
     ctx.rotate(rotations[direction]);
     ctx.scale(scaleX, scaleY);
-
-    // Тінь
+// Тінь
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
     ctx.beginPath();
     ctx.roundRect(-6.5, -5.5, 14, 13, 2);
     ctx.fill();
-
-    // Гусениці
+// Гусениці
     ctx.fillStyle = '#1b1e23';
     ctx.beginPath();
     ctx.roundRect(-7, -6.5, 3.2, 13, 1);
     ctx.roundRect(3.8, -6.5, 3.2, 13, 1);
     ctx.fill();
-
-    // Анімація гусениць
+// Анімація гусениць
     const trackOffset = Math.floor(timestamp / 85) % 3;
-
     ctx.fillStyle = colors.track;
-
     for (let ty = -5 + trackOffset; ty <= 5; ty += 3) {
         ctx.fillRect(-6.5, ty, 2.2, 1.2);
         ctx.fillRect(4.3, ty, 2.2, 1.2);
     }
-
-    // Бронекорпус
+// Бронекорпус
     const bodyGrad = ctx.createLinearGradient(-4.5, -6, 4.5, 6);
-
     bodyGrad.addColorStop(0, colors.light);
     bodyGrad.addColorStop(0.5, colors.main);
     bodyGrad.addColorStop(1, colors.dark);
-
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
-
-    if (enemy.type === 'fast') {
-        ctx.roundRect(-4, -5.5, 8, 11, 2);
-    } else if (enemy.type === 'power') {
-        ctx.roundRect(-5, -5.5, 10, 11, 1);
-    } else if (enemy.type === 'armored') {
-        ctx.roundRect(-5, -6, 10, 12, 0.5);
-    } else {
-        ctx.roundRect(-4.5, -5.5, 9, 11, 1.5);
-    }
-
+    ctx.roundRect(-4.5, -5.5, 9, 11, 1.5);
     ctx.fill();
-
     ctx.strokeStyle = colors.dark;
     ctx.lineWidth = 0.8;
     ctx.stroke();
-
-    // Додаткова броня важкого танка
-    if (enemy.type === 'armored') {
-        ctx.strokeStyle = '#dcd6ff';
-        ctx.lineWidth = 0.7;
-        ctx.strokeRect(-4, -5, 8, 10);
-
-        ctx.fillStyle = '#dcd6ff';
-        ctx.fillRect(-4, -2, 8, 0.8);
-        ctx.fillRect(-4, 2, 8, 0.8);
-    }
-
-    // Фари
+// Передні сенсори
     ctx.fillStyle = colors.light;
     ctx.fillRect(-3.5, -6, 1.5, 1);
     ctx.fillRect(2, -6, 1.5, 1);
-
-    // Ствол
+// Ствол
     const barrelGrad = ctx.createLinearGradient(-1.5, 0, 1.5, 0);
-
     barrelGrad.addColorStop(0, '#636e72');
     barrelGrad.addColorStop(0.5, '#dfe6e9');
     barrelGrad.addColorStop(1, '#2d3436');
-
     ctx.fillStyle = barrelGrad;
-
-    if (enemy.type === 'power' || enemy.type === 'armored') {
-        ctx.fillRect(-1.5, -9, 3, 7);
-    } else {
-        ctx.fillRect(-1.1, -8.5, 2.2, 6);
-    }
-
+    ctx.fillRect(-1.1, -8.5, 2.2, 6);
     ctx.fillStyle = '#2d3436';
     ctx.fillRect(-1.4, -9, 2.8, 1.4);
-
-    // Башта
-    const turretGrad = ctx.createRadialGradient(
-        -1,
-        -1,
-        0.5,
-        0,
-        0,
-        4.5
-    );
-
+// Башта
+    const turretGrad = ctx.createRadialGradient(-1, -1, 0.5, 0, 0, 4.5);
     turretGrad.addColorStop(0, colors.light);
     turretGrad.addColorStop(0.7, colors.turret);
     turretGrad.addColorStop(1, colors.dark);
-
     ctx.fillStyle = turretGrad;
     ctx.beginPath();
-
-    if (enemy.type === 'fast') {
-        ctx.arc(0, 0, 2.8, 0, Math.PI * 2);
-    } else if (enemy.type === 'power') {
-        ctx.roundRect(-3.8, -3.5, 7.6, 7, 0.5);
-    } else {
-        ctx.roundRect(-3.2, -3, 6.4, 6.4, 1.2);
-    }
-
+    ctx.roundRect(-3.2, -3, 6.4, 6.4, 1.2);
     ctx.fill();
-
-    ctx.strokeStyle = colors.dark;
-    ctx.lineWidth = 0.7;
     ctx.stroke();
-
-    // Люк
+// Люк
     ctx.fillStyle = colors.dark;
     ctx.beginPath();
     ctx.arc(0, 0.5, 1.4, 0, Math.PI * 2);
     ctx.fill();
-
     ctx.restore();
-}
-
-function getEnemyColors(enemy) {
-    if (enemy.type !== 'armored') {
-        return enemy.colors;
-    }
-
-    // Колір броньованого танка змінюється після влучань
-    const damageStage = enemy.maxHealth - enemy.health;
-
-    if (damageStage === 1) {
-        return {
-            ...enemy.colors,
-            light: '#ffeaa7',
-            main: '#d6a928',
-            dark: '#80600e',
-            turret: '#bd941c'
-        };
-    }
-
-    if (damageStage === 2) {
-        return {
-            ...enemy.colors,
-            light: '#ffb86b',
-            main: '#d97706',
-            dark: '#85420a',
-            turret: '#b85c0a'
-        };
-    }
-
-    if (damageStage >= 3) {
-        return {
-            ...enemy.colors,
-            light: '#ff8a8a',
-            main: '#b33939',
-            dark: '#641d1d',
-            turret: '#8e2929'
-        };
-    }
-
-    return enemy.colors;
 }

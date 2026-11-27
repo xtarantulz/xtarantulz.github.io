@@ -201,7 +201,7 @@ function update(deltaTime) {
         fireBullet();
     }
 
-    updateEnemies(deltaTime);
+    updateEnemies(deltaTime, getPlayer());
 
     updateBullets(deltaTime, {
         player: getPlayer(),

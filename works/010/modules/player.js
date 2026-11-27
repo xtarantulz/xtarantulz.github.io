@@ -1,4 +1,3 @@
-
 import { CONFIG } from './config.js';
 import { canMoveTo } from './collision.js';
 import { addTrack } from './effects.js';
@@ -7,6 +6,7 @@ import { events } from './events.js';
 
 const PLAYER_SIZE = 14;
 const RESPAWN_INVULNERABILITY = 3000;
+const CORNER_ASSIST_PX = 4;
 
 let player = null;
 let playerOnForest = false;
@@ -64,40 +64,15 @@ export function movePlayer(direction, deltaTime, enemies = []) {
     player.direction = direction;
 
     const distance = player.speed * (deltaTime / 16.67);
+    const resolved = resolvePlayerStep(direction, distance, enemies);
 
-    let nextX = player.x;
-    let nextY = player.y;
-
-    switch (direction) {
-        case 'up':
-            nextY -= distance;
-            break;
-
-        case 'down':
-            nextY += distance;
-            break;
-
-        case 'left':
-            nextX -= distance;
-            break;
-
-        case 'right':
-            nextX += distance;
-            break;
-    }
-
-    if (!canMoveTo(nextX, nextY, player.width, player.height)) {
+    if (!resolved) {
         stopPlayer();
         return;
     }
 
-    if (hasEnemyCollision(nextX, nextY, enemies)) {
-        stopPlayer();
-        return;
-    }
-
-    player.x = nextX;
-    player.y = nextY;
+    player.x = resolved.x;
+    player.y = resolved.y;
 
     if (!player.isMoving) {
         player.isMoving = true;
@@ -113,6 +88,62 @@ export function movePlayer(direction, deltaTime, enemies = []) {
     );
 }
 
+function resolvePlayerStep(direction, distance, enemies) {
+    const step = getStepVector(direction, distance);
+    const directX = player.x + step.dx;
+    const directY = player.y + step.dy;
+
+    if (isFreeForPlayer(directX, directY, enemies)) {
+        return { x: directX, y: directY };
+    }
+
+    // М'яке огинання кутів перешкод (Corner Assist)
+    const isVertical = direction === 'up' || direction === 'down';
+    const offsets = [1, -1, 2, -2, 3, -3, 4, -4];
+
+    for (const offset of offsets) {
+        if (Math.abs(offset) > CORNER_ASSIST_PX) continue;
+
+        const testX = isVertical ? player.x + offset : directX;
+        const testY = isVertical ? directY : player.y + offset;
+
+        if (isFreeForPlayer(testX, testY, enemies)) {
+            return { x: testX, y: testY };
+        }
+    }
+
+    // Якщо повний крок заблоковано, під'їжджаємо впритул до перешкоди
+    const halfStep = getStepVector(direction, distance * 0.4);
+    if (isFreeForPlayer(player.x + halfStep.dx, player.y + halfStep.dy, enemies)) {
+        return { x: player.x + halfStep.dx, y: player.y + halfStep.dy };
+    }
+
+    return null;
+}
+
+function getStepVector(direction, distance) {
+    switch (direction) {
+        case 'up':
+            return { dx: 0, dy: -distance };
+        case 'down':
+            return { dx: 0, dy: distance };
+        case 'left':
+            return { dx: -distance, dy: 0 };
+        case 'right':
+            return { dx: distance, dy: 0 };
+        default:
+            return { dx: 0, dy: 0 };
+    }
+}
+
+function isFreeForPlayer(nextX, nextY, enemies) {
+    if (!canMoveTo(nextX, nextY, player.width, player.height)) {
+        return false;
+    }
+
+    return !hasEnemyCollision(nextX, nextY, enemies);
+}
+
 function updateForestState() {
     const onForest = isTankOnForest(player);
 
@@ -123,13 +154,43 @@ function updateForestState() {
     events.emit('player:forest', onForest);
 }
 
-function hasEnemyCollision(x, y, enemies) {
-    return enemies.some(enemy => (
-        x < enemy.x + enemy.width &&
-        x + player.width > enemy.x &&
-        y < enemy.y + enemy.height &&
-        y + player.height > enemy.y
-    ));
+function hasEnemyCollision(nextX, nextY, enemies) {
+    const curCenterX = player.x + player.width / 2;
+    const curCenterY = player.y + player.height / 2;
+    const nextCenterX = nextX + player.width / 2;
+    const nextCenterY = nextY + player.height / 2;
+
+    return enemies.some(enemy => {
+        const overlapsNext = (
+            nextX < enemy.x + enemy.width &&
+            nextX + player.width > enemy.x &&
+            nextY < enemy.y + enemy.height &&
+            nextY + player.height > enemy.y
+        );
+
+        if (!overlapsNext) return false;
+
+        // Якщо танки вже зчепилися кутами — дозволяємо рух у бік роз'їзду
+        const alreadyOverlapping = (
+            player.x < enemy.x + enemy.width &&
+            player.x + player.width > enemy.x &&
+            player.y < enemy.y + enemy.height &&
+            player.y + player.height > enemy.y
+        );
+
+        if (alreadyOverlapping) {
+            const enemyCenterX = enemy.x + enemy.width / 2;
+            const enemyCenterY = enemy.y + enemy.height / 2;
+            const curDist = Math.hypot(curCenterX - enemyCenterX, curCenterY - enemyCenterY);
+            const nextDist = Math.hypot(nextCenterX - enemyCenterX, nextCenterY - enemyCenterY);
+
+            if (nextDist > curDist) {
+                return false;
+            }
+        }
+
+        return true;
+    });
 }
 
 export function stopPlayer() {
@@ -159,7 +220,6 @@ export function drawPlayer(ctx, timestamp = 0) {
 
     ctx.save();
 
-    // Мигання під час тимчасової невразливості
     if (invulnerable && Math.floor(timestamp / 120) % 2 === 0) {
         ctx.restore();
         return;
