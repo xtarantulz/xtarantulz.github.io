@@ -1,7 +1,7 @@
-import { CONFIG } from './config.js';
-import { renderMap } from './renderer.js';
-import { generateNewLevel } from './map.js';
-import { events } from './events.js';
+import {CONFIG} from './config.js';
+import {renderMap} from './renderer.js';
+import {generateNewLevel} from './map.js';
+import {events} from './events.js';
 import './sounds.js';
 
 import {
@@ -158,7 +158,7 @@ export function getGameState() {
 }
 
 export function getStats() {
-    return { ...stats };
+    return {...stats};
 }
 
 function gameLoop(timestamp) {
@@ -423,11 +423,7 @@ function handleKeyDown(event) {
 
     event.preventDefault();
 
-    if (gameState === 'playing') {
-        pauseGame();
-    } else if (gameState === 'paused') {
-        resumeGame();
-    }
+    startGame();
 }
 
 function updateStartButton() {
@@ -467,6 +463,7 @@ function updateStats() {
     if (livesElement) {
         livesElement.textContent = String(stats.lives).padStart(2, '0');
     }
+
     if (enemiesElement) {
         enemiesElement.textContent = String(stats.enemies).padStart(2, '0');
     }
