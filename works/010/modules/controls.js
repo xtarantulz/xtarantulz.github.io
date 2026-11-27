@@ -127,8 +127,7 @@ function initTouchControls() {
     }
 
     if (pauseBtn) {
-        pauseBtn.addEventListener('pointerdown', (e) => {
-            e.preventDefault();
+        pauseBtn.addEventListener('click', () => {
             const startButton = document.getElementById('start-button');
             if (startButton) {
                 startButton.click();
