@@ -1,10 +1,10 @@
-
 import { CONFIG } from './config.js';
 import { getPlayer } from './player.js';
 import { getBulletCollision } from './collision.js';
 import {
     TILE,
-    destroyBrickAt
+    destroyBrickAt,
+    destroySteelAt
 } from './map.js';
 import {
     createMuzzleFlash,
@@ -24,11 +24,14 @@ export function fireBullet() {
         return;
     }
 
+    const rank = player.rank || 1;
+    const maxBullets = rank >= 3 ? 2 : CONFIG.bullets.maxPerPlayer;
+
     const playerBullets = bullets.filter(
         bullet => bullet.owner === 'player'
     );
 
-    if (playerBullets.length >= CONFIG.bullets.maxPerPlayer) {
+    if (playerBullets.length >= maxBullets) {
         return;
     }
 
@@ -56,6 +59,11 @@ export function fireEnemyBullet(enemy) {
 function createBullet(tank, owner) {
     const centerX = tank.x + tank.width / 2;
     const centerY = tank.y + tank.height / 2;
+    const rank = owner === 'player' ? (tank.rank || 1) : 1;
+
+    const speed = owner === 'player'
+        ? CONFIG.bullets.speed * (rank >= 2 ? 1.35 : 1)
+        : CONFIG.enemies.bulletSpeed;
 
     const bullet = {
         x: centerX - BULLET_SIZE / 2,
@@ -63,10 +71,10 @@ function createBullet(tank, owner) {
         width: BULLET_SIZE,
         height: BULLET_SIZE,
         direction: tank.direction,
-        speed: owner === 'player'
-            ? CONFIG.bullets.speed
-            : CONFIG.enemies.bulletSpeed,
+        speed,
         owner,
+        rank,
+        canBreakSteel: owner === 'player' && rank >= 4,
         shooter: tank
     };
 
@@ -236,15 +244,18 @@ function handleMapCollision(bullet, targets) {
         if (bullet.owner === 'player') {
             events.emit('bullet:brick-hit');
         }
-    } else if (collision.tile === TILE.STEEL || collision.tile === null) {
-        createHitParticles(hitX, hitY, 'spark');
-
-        if (
-            collision.tile === TILE.STEEL &&
-            bullet.owner === 'player'
-        ) {
+    } else if (collision.tile === TILE.STEEL) {
+        if (bullet.canBreakSteel) {
+            destroySteelAt(collision.row, collision.column);
+            if (bullet.owner === 'player') {
+                events.emit('bullet:brick-hit');
+            }
+        } else if (bullet.owner === 'player') {
             events.emit('bullet:steel-hit');
         }
+        createHitParticles(hitX, hitY, 'spark');
+    } else if (collision.tile === null) {
+        createHitParticles(hitX, hitY, 'spark');
     }
 
     if (collision.tile === TILE.HEADQUARTERS) {
@@ -319,11 +330,17 @@ export function drawBullets(ctx) {
         ctx.rotate(rotations[bullet.direction]);
 
         const isPlayer = bullet.owner === 'player';
+        const isSuper = bullet.canBreakSteel;
 
         // Огненный хвіст
         const trailGrad = ctx.createLinearGradient(0, -2, 0, 9);
-        trailGrad.addColorStop(0, isPlayer ? 'rgba(255, 230, 100, 0.9)' : 'rgba(255, 90, 90, 0.9)');
-        trailGrad.addColorStop(1, 'rgba(255, 100, 0, 0)');
+        if (isSuper) {
+            trailGrad.addColorStop(0, 'rgba(56, 189, 248, 0.95)');
+            trailGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+        } else {
+            trailGrad.addColorStop(0, isPlayer ? 'rgba(255, 230, 100, 0.9)' : 'rgba(255, 90, 90, 0.9)');
+            trailGrad.addColorStop(1, 'rgba(255, 100, 0, 0)');
+        }
 
         ctx.fillStyle = trailGrad;
         ctx.beginPath();
@@ -334,11 +351,11 @@ export function drawBullets(ctx) {
         ctx.fill();
 
         // Світіння боєголовки
-        ctx.shadowColor = isPlayer ? '#ffdd59' : '#ff4d4d';
+        ctx.shadowColor = isSuper ? '#38bdf8' : (isPlayer ? '#ffdd59' : '#ff4d4d');
         ctx.shadowBlur = 6;
 
         // Корпус снаряда
-        ctx.fillStyle = isPlayer ? '#fff8e1' : '#ffcccc';
+        ctx.fillStyle = isSuper ? '#e0f2fe' : (isPlayer ? '#fff8e1' : '#ffcccc');
         ctx.beginPath();
         ctx.moveTo(0, -4.5);
         ctx.quadraticCurveTo(2.2, -1.5, 1.8, 2.5);

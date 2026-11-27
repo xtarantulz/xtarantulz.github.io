@@ -1,17 +1,21 @@
-import {CONFIG} from './config.js';
-import {canMoveTo} from './collision.js';
-import {fireEnemyBullet} from './bullets.js';
-import {addTrack} from './effects.js';
+import { CONFIG } from './config.js';
+import { canMoveTo } from './collision.js';
+import { fireEnemyBullet } from './bullets.js';
+import { addTrack } from './effects.js';
+import { isEnemiesFrozen } from './bonuses.js';
 
 const ENEMY_SIZE = CONFIG.enemies.size;
 
 const SPAWN_POSITIONS = [
-    {x: 1, y: 1},
-    {x: CONFIG.canvas.width / 2 - ENEMY_SIZE / 2, y: 1},
-    {x: CONFIG.canvas.width - ENEMY_SIZE - 1, y: 1}
+    { x: 1, y: 1 },
+    { x: CONFIG.canvas.width / 2 - ENEMY_SIZE / 2, y: 1 },
+    { x: CONFIG.canvas.width - ENEMY_SIZE - 1, y: 1 }
 ];
 
 const DIRECTIONS = ['up', 'right', 'down', 'left'];
+
+// Номери ворожих танків, які виїжджають як миготливі бонусні (як у Battle City)
+const BONUS_ENEMY_NUMBERS = new Set(Array.of(4, 11, 18));
 
 const ENEMY_TYPES = {
     basic: {
@@ -88,10 +92,10 @@ const ENEMY_TYPES = {
 };
 
 const ENEMY_TYPE_WEIGHTS = [
-    {type: 'basic', weight: 45},
-    {type: 'fast', weight: 25},
-    {type: 'power', weight: 20},
-    {type: 'armored', weight: 10}
+    { type: 'basic', weight: 45 },
+    { type: 'fast', weight: 25 },
+    { type: 'power', weight: 20 },
+    { type: 'armored', weight: 10 }
 ];
 
 let enemies = [];
@@ -111,6 +115,10 @@ export function getEnemies() {
 }
 
 export function updateEnemies(deltaTime, player = null) {
+    if (isEnemiesFrozen()) {
+        return;
+    }
+
     if (spawnedCount < CONFIG.enemies.total) {
         spawnTimer += deltaTime;
 
@@ -168,6 +176,9 @@ function spawnEnemy(player = null) {
         if (!canMoveTo(x, y, type.width, type.height)) continue;
         if (hasTankCollision(x, y, type.width, type.height, null, player)) continue;
 
+        spawnedCount++;
+        const isBonus = BONUS_ENEMY_NUMBERS.has(spawnedCount);
+
         enemies.push({
             x,
             y,
@@ -176,6 +187,7 @@ function spawnEnemy(player = null) {
             visualScale: type.visualScale,
 
             type: type.name,
+            isBonus,
             speed: type.speed,
 
             health: type.health,
@@ -190,7 +202,6 @@ function spawnEnemy(player = null) {
             fireTimer: randomFireTime(type.fireInterval)
         });
 
-        spawnedCount++;
         return true;
     }
 
@@ -237,16 +248,15 @@ function resolveEnemyStep(enemy, movement, player) {
         return nextPosition;
     }
 
-    // М'яке огинання кутів перешкод
     const isVertical = enemy.direction === 'up' || enemy.direction === 'down';
-    const offsets = [1, -1, 2, -2, 3, -3];
+    const offsets = Array.of(1, -1, 2, -2, 3, -3);
 
     for (const offset of offsets) {
         const testX = isVertical ? enemy.x + offset : nextPosition.x;
         const testY = isVertical ? nextPosition.y : enemy.y + offset;
 
         if (isFreeForEnemy(testX, testY, enemy, player)) {
-            return {x: testX, y: testY};
+            return { x: testX, y: testY };
         }
     }
 
@@ -262,7 +272,7 @@ function isFreeForEnemy(nextX, nextY, enemy, player) {
 }
 
 function getNextPosition(enemy, movement) {
-    const position = {x: enemy.x, y: enemy.y};
+    const position = { x: enemy.x, y: enemy.y };
 
     switch (enemy.direction) {
         case 'up':
@@ -331,7 +341,6 @@ function hasTankCollision(
 
         if (!overlapsNext) return false;
 
-        // Якщо танки вже торкнулися — дозволяємо крок на збільшення дистанції
         if (currentEnemy) {
             const alreadyOverlapping = (
                 currentEnemy.x < other.x + other.width &&
@@ -370,37 +379,42 @@ function randomFireTime(multiplier = 1) {
         (0.6 + Math.random() * 0.8);
 }
 
-function getEnemyColors(enemy) {
+function getEnemyColors(enemy, timestamp = 0) {
+    // Миготливий рубіновий відблиск для бонусного танка
+    if (enemy.isBonus && Math.floor(timestamp / 130) % 2 === 0) {
+        return {
+            light: '#ff9ff3',
+            main: '#ff1e56',
+            dark: '#7a0926',
+            turret: '#e6194b',
+            track: '#4a1525'
+        };
+    }
+
     if (enemy.type !== 'armored') {
         return enemy.colors;
     }
 
-    // Візуальна індикація пошкодження броні у важкого танка
     if (enemy.health === 3) {
-        return {...enemy.colors, light: '#81ecec', main: '#00cec9', dark: '#006266'};
+        return { ...enemy.colors, light: '#81ecec', main: '#00cec9', dark: '#006266' };
     }
     if (enemy.health === 2) {
-        return {...enemy.colors, light: '#ffeaa7', main: '#fdcb6e', dark: '#b7791f'};
+        return { ...enemy.colors, light: '#ffeaa7', main: '#fdcb6e', dark: '#b7791f' };
     }
     if (enemy.health === 1) {
-        return {...enemy.colors, light: '#ff7675', main: '#d63031', dark: '#7f1414'};
+        return { ...enemy.colors, light: '#ff7675', main: '#d63031', dark: '#7f1414' };
     }
-
     return enemy.colors;
 }
-
 export function drawEnemies(ctx, timestamp = 0) {
-    enemies.forEach(enemy => drawEnemy(ctx, enemy, timestamp));
+    const frozen = isEnemiesFrozen();
+    enemies.forEach(enemy => drawEnemy(ctx, enemy, timestamp, frozen));
 }
-
-function drawEnemy(ctx, enemy, timestamp = 0) {
-    const {x, y, width, height, direction} = enemy;
-
+function drawEnemy(ctx, enemy, timestamp = 0, frozen = false) {
+    const { x, y, width, height, direction } = enemy;
     const scaleX = (width / 14) * (enemy.visualScale || 1);
     const scaleY = (height / 14) * (enemy.visualScale || 1);
-
-    const colors = getEnemyColors(enemy);
-
+    const colors = getEnemyColors(enemy, timestamp);
     ctx.save();
     ctx.translate(x + width / 2, y + height / 2);
     const rotations = {
@@ -423,7 +437,7 @@ function drawEnemy(ctx, enemy, timestamp = 0) {
     ctx.roundRect(3.8, -6.5, 3.2, 13, 1);
     ctx.fill();
 // Анімація гусениць
-    const trackOffset = Math.floor(timestamp / 85) % 3;
+    const trackOffset = frozen ? 0 : Math.floor(timestamp / 85) % 3;
     ctx.fillStyle = colors.track;
     for (let ty = -5 + trackOffset; ty <= 5; ty += 3) {
         ctx.fillRect(-6.5, ty, 2.2, 1.2);
@@ -469,5 +483,13 @@ function drawEnemy(ctx, enemy, timestamp = 0) {
     ctx.beginPath();
     ctx.arc(0, 0.5, 1.4, 0, Math.PI * 2);
     ctx.fill();
+// Крижаний контур при заморозці
+    if (frozen) {
+        ctx.fillStyle = 'rgba(56, 189, 248, 0.25)';
+        ctx.fillRect(-7, -7, 14, 14);
+        ctx.strokeStyle = 'rgba(125, 211, 252, 0.95)';
+        ctx.lineWidth = 1.2;
+        ctx.strokeRect(-7, -7, 14, 14);
+    }
     ctx.restore();
 }

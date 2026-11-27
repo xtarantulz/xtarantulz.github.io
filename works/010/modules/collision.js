@@ -1,11 +1,16 @@
-
 import { CONFIG } from './config.js';
 import { getTile, TILE } from './map.js';
 
-const BLOCKING_TILES = new Set([
+const TANK_BLOCKING_TILES = new Set([
     TILE.BRICK,
     TILE.STEEL,
     TILE.WATER,
+    TILE.HEADQUARTERS
+]);
+
+const BULLET_BLOCKING_TILES = new Set([
+    TILE.BRICK,
+    TILE.STEEL,
     TILE.HEADQUARTERS
 ]);
 
@@ -21,7 +26,7 @@ export function canMoveTo(x, y, width, height) {
         for (let column = left; column <= right; column++) {
             const tile = getTile(row, column);
 
-            if (tile === null || BLOCKING_TILES.has(tile)) {
+            if (tile === null || TANK_BLOCKING_TILES.has(tile)) {
                 return false;
             }
         }
@@ -42,7 +47,7 @@ export function getBulletCollision(x, y, width, height) {
         for (let column = left; column <= right; column++) {
             const tile = getTile(row, column);
 
-            if (tile === null || BLOCKING_TILES.has(tile)) {
+            if (tile === null || BULLET_BLOCKING_TILES.has(tile)) {
                 return {
                     row,
                     column,

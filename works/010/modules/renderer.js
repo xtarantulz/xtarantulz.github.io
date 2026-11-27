@@ -5,6 +5,7 @@ import { drawPlayer } from './player.js';
 import { drawBullets } from './bullets.js';
 import { drawEnemies } from './enemies.js';
 import { drawExplosions } from './explosions.js';
+import { drawBonuses } from './bonuses.js';
 import {
     drawTracks,
     drawForegroundEffects
@@ -62,6 +63,9 @@ export function renderMap(ctx, timestamp = 0) {
             }
         }
     }
+
+    // Бонусы поверх карты и леса
+    drawBonuses(ctx, timestamp);
 }
 
 function clearCanvas(ctx) {

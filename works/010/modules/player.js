@@ -11,7 +11,9 @@ const CORNER_ASSIST_PX = 4;
 let player = null;
 let playerOnForest = false;
 
-export function createPlayer() {
+export function createPlayer(keepRank = false) {
+    const prevRank = keepRank && player ? player.rank : 1;
+
     if (player?.isMoving) {
         events.emit('player:stop');
     }
@@ -27,7 +29,8 @@ export function createPlayer() {
         width: PLAYER_SIZE,
         height: PLAYER_SIZE,
         direction: 'up',
-        speed: CONFIG.player.speed,
+        speed: CONFIG.player.speed + (prevRank - 1) * 0.15,
+        rank: prevRank,
         isMoving: false,
         invulnerable: false,
         invulnerabilityTime: 0
@@ -38,6 +41,17 @@ export function createPlayer() {
 
 export function getPlayer() {
     return player;
+}
+
+export function upgradePlayerRank() {
+    if (!player) return 1;
+
+    if (player.rank < 4) {
+        player.rank++;
+        player.speed = CONFIG.player.speed + (player.rank - 1) * 0.15;
+    }
+
+    return player.rank;
 }
 
 export function activatePlayerRespawn() {
@@ -215,7 +229,8 @@ export function drawPlayer(ctx, timestamp = 0) {
         height,
         direction,
         isMoving,
-        invulnerable
+        invulnerable,
+        rank = 1
     } = player;
 
     ctx.save();
@@ -252,7 +267,7 @@ export function drawPlayer(ctx, timestamp = 0) {
     // Анімація траків гусениць
     const trackOffset = isMoving ? Math.floor(timestamp / 60) % 3 : 0;
 
-    ctx.fillStyle = '#6e7681';
+    ctx.fillStyle = rank >= 3 ? '#ffd43b' : '#6e7681';
 
     for (let ty = -5 + trackOffset; ty <= 5; ty += 3) {
         ctx.fillRect(-6.5, ty, 2.2, 1.2);
@@ -261,9 +276,15 @@ export function drawPlayer(ctx, timestamp = 0) {
 
     // Бронекорпус
     const bodyGrad = ctx.createLinearGradient(-4.5, -6, 4.5, 6);
-    bodyGrad.addColorStop(0, '#ffe066');
-    bodyGrad.addColorStop(0.5, '#f5b800');
-    bodyGrad.addColorStop(1, '#b37d00');
+    if (rank >= 4) {
+        bodyGrad.addColorStop(0, '#fff9db');
+        bodyGrad.addColorStop(0.5, '#ffd43b');
+        bodyGrad.addColorStop(1, '#e67700');
+    } else {
+        bodyGrad.addColorStop(0, '#ffe066');
+        bodyGrad.addColorStop(0.5, '#f5b800');
+        bodyGrad.addColorStop(1, '#b37d00');
+    }
 
     ctx.fillStyle = bodyGrad;
     ctx.beginPath();
@@ -280,17 +301,18 @@ export function drawPlayer(ctx, timestamp = 0) {
     ctx.fillRect(1.9, -6, 1.6, 1);
 
     // Ствол гармати
+    const barrelWidth = rank >= 3 ? 2.8 : 2.2;
     const barrelGrad = ctx.createLinearGradient(-1.5, 0, 1.5, 0);
     barrelGrad.addColorStop(0, '#7a828e');
     barrelGrad.addColorStop(0.5, '#e6edf3');
     barrelGrad.addColorStop(1, '#57606a');
 
     ctx.fillStyle = barrelGrad;
-    ctx.fillRect(-1.1, -8.5, 2.2, 6);
+    ctx.fillRect(-barrelWidth / 2, -8.8, barrelWidth, 6.3);
 
     // Дульне гальмо
-    ctx.fillStyle = '#30363d';
-    ctx.fillRect(-1.5, -9, 3, 1.5);
+    ctx.fillStyle = rank >= 4 ? '#ffd43b' : '#30363d';
+    ctx.fillRect(-1.7, -9.2, 3.4, 1.6);
 
     // Башта
     const turretGrad = ctx.createRadialGradient(-1, -1, 0.5, 0, 0, 4.5);
@@ -303,6 +325,12 @@ export function drawPlayer(ctx, timestamp = 0) {
     ctx.roundRect(-3.2, -3, 6.4, 6.4, 2);
     ctx.fill();
     ctx.stroke();
+
+    // Індикатори рангу (смужки на кормі)
+    ctx.fillStyle = '#ffffff';
+    for (let r = 0; r < rank - 1; r++) {
+        ctx.fillRect(-3 + r * 2.2, 4, 1.5, 1.2);
+    }
 
     // Командирський люк
     ctx.fillStyle = '#d49b00';

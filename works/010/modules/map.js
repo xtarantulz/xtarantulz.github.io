@@ -41,6 +41,34 @@ export function destroyBrickAt(row, column) {
     return true;
 }
 
+export function destroySteelAt(row, column) {
+    if (getTile(row, column) !== TILE.STEEL) {
+        return false;
+    }
+
+    currentMap[row][column] = TILE.EMPTY;
+    return true;
+}
+
+export function setBaseFortification(tile) {
+    const hqRow = CONFIG.map.rows - 1;
+    const hqCol = 12;
+
+    const coords = [
+        [hqRow - 1, hqCol - 1],
+        [hqRow - 1, hqCol],
+        [hqRow - 1, hqCol + 1],
+        [hqRow, hqCol - 1],
+        [hqRow, hqCol + 1]
+    ];
+
+    coords.forEach(([r, c]) => {
+        if (currentMap[r]?.[c] !== undefined && currentMap[r][c] !== TILE.HEADQUARTERS) {
+            currentMap[r][c] = tile;
+        }
+    });
+}
+
 export function isTankOnForest(tank) {
     if (!tank) return false;
 
