@@ -1,0 +1,247 @@
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+    background: #050711;
+    color: #f2f2f7;
+    font-family: 'DM Sans', sans-serif;
+}
+
+#siteHeader,
+#siteFooter {
+    position: relative;
+    z-index: 5;
+}
+
+.solar-scene {
+    position: relative;
+    min-height: calc(100vh - 140px);
+    overflow: hidden;
+    background:
+            radial-gradient(ellipse at 50% 50%, #11182b 0%, #080c19 45%, #050711 100%);
+}
+
+#solarCanvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+#solarCanvas canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.scene-title {
+    position: absolute;
+    top: 35px;
+    left: 42px;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.section-label {
+    color: #ff7b02;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+}
+
+.scene-title h1 {
+    margin: 12px 0 5px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(32px, 4vw, 48px);
+    line-height: 1;
+    letter-spacing: -2px;
+}
+
+.scene-title h1 span {
+    color: #ff7b02;
+}
+
+.scene-title p {
+    margin: 0;
+    color: #9298ad;
+    font-size: 13px;
+}
+
+.planet-info {
+    position: absolute;
+    top: 38px;
+    right: 38px;
+    z-index: 3;
+    width: 235px;
+    padding: 19px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 12px;
+    background: rgba(9, 13, 27, .78);
+    backdrop-filter: blur(14px);
+    pointer-events: none;
+}
+
+.info-label {
+    color: #ff7b02;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.planet-info h2 {
+    margin: 9px 0 5px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 24px;
+}
+
+.planet-info p {
+    margin: 0;
+    color: #9298ad;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.info-details {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, .1);
+    color: #d0d4e0;
+    font-size: 11px;
+}
+
+.scene-hint {
+    position: absolute;
+    bottom: 24px;
+    left: 38px;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: #777f96;
+    font-size: 11px;
+    pointer-events: none;
+}
+
+.scene-controls {
+    position: absolute;
+    right: 38px;
+    bottom: 24px;
+    z-index: 3;
+    display: flex;
+    gap: 8px;
+}
+
+.scene-controls button {
+    padding: 10px 14px;
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 7px;
+    background: rgba(15, 20, 37, .85);
+    color: #e5e8f0;
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.scene-controls button:hover {
+    border-color: #ff7b02;
+    color: #ff7b02;
+}
+
+.planet-list {
+    position: absolute;
+    bottom: 76px;
+    left: 50%;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    width: min(90%, 760px);
+    transform: translateX(-50%);
+}
+
+.planet-list button {
+    padding: 7px 11px;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 20px;
+    background: rgba(10, 15, 29, .8);
+    color: #aab0c2;
+    font: inherit;
+    font-size: 10px;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.planet-list button:hover,
+.planet-list button.active {
+    border-color: #ff7b02;
+    background: rgba(255, 123, 2, .12);
+    color: #ff9b43;
+}
+
+@media (max-width: 700px) {
+    .solar-scene {
+        min-height: calc(100vh - 140px);
+    }
+
+    .scene-title {
+        top: 22px;
+        left: 18px;
+    }
+
+    .scene-title h1 {
+        font-size: 32px;
+    }
+
+    .planet-info {
+        top: auto;
+        right: 14px;
+        bottom: 125px;
+        width: 170px;
+        padding: 12px;
+    }
+
+    .planet-info h2 {
+        font-size: 19px;
+    }
+
+    .planet-list {
+        bottom: 75px;
+        width: 96%;
+        gap: 4px;
+    }
+
+    .planet-list button {
+        padding: 6px 8px;
+        font-size: 9px;
+    }
+
+    .scene-hint {
+        bottom: 15px;
+        left: 15px;
+        font-size: 9px;
+    }
+
+    .scene-controls {
+        right: 12px;
+        bottom: 12px;
+        gap: 5px;
+    }
+
+    .scene-controls button {
+        padding: 8px;
+        font-size: 9px;
+    }
+}

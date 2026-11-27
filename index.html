@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Canvas xTaRaNTuLz — колекція frontend-робіт.">
+  <title>Canvas xTaRaNTuLz</title>
+
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<div id="siteHeader"></div>
+
+<main class="container">
+  <section class="catalog" aria-label="Каталог робіт">
+
+    <div class="catalog-heading">
+      <div>
+        <span class="section-label">МОЯ КОЛЕКЦІЯ</span>
+        <h1>Frontend Works<span>.</span></h1>
+        <p>Інтерактивні експерименти, інструменти та вебінтерфейси.</p>
+      </div>
+
+      <div class="catalog-counter">
+        <span id="worksCount">00</span>
+        <small>РОБІТ</small>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <select id="categoryFilter" aria-label="Фільтр за категорією">
+        <option value="">Усі категорії</option>
+      </select>
+    </div>
+
+    <div
+            id="tagList"
+            class="tag-list"
+            aria-label="Фільтр за тегами"
+    ></div>
+
+    <div id="catalogInfo" class="catalog-info" aria-live="polite">
+      Завантаження робіт...
+    </div>
+
+    <div id="worksGrid" class="works-grid"></div>
+
+    <div id="emptyState" class="empty-state" hidden>
+      <strong>Нічого не знайдено</strong>
+      <span>Спробуйте змінити фільтри.</span>
+    </div>
+
+  </section>
+</main>
+
+<div id="siteFooter"></div>
+
+<script src="assets/libs/jquery/jquery-3.7.1.min.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/app.js"></script>
+
+</body>
+</html>

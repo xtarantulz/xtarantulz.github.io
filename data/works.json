@@ -1,0 +1,113 @@
+[
+  {
+    "id": "001",
+    "title": "Новорічний фон для сайту",
+    "categoryId": "backgrounds",
+    "tags": ["HTML", "CSS", "JavaScript", "Canvas", "Animation", "Christmas"],
+    "addedAt": "2026-11-20",
+    "url": "works/001/"
+  },
+  {
+    "id": "002",
+    "title": "Робот шукає шлях",
+    "categoryId": "experiments",
+    "tags": ["HTML", "CSS", "JavaScript", "Algorithm", "DFS", "Maze"],
+    "addedAt": "2026-11-27",
+    "url": "works/002/"
+  },
+  {
+    "id": "003",
+    "title": "Салют",
+    "categoryId": "effects",
+    "tags": ["HTML", "CSS", "JavaScript", "Canvas", "Animation", "Fireworks"],
+    "addedAt": "2026-11-27",
+    "url": "works/003/"
+  },
+  {
+    "id": "004",
+    "title": "Анімаційні кулі",
+    "categoryId": "backgrounds",
+    "tags": ["HTML", "CSS", "JavaScript", "Canvas", "Animation", "Particles"],
+    "addedAt": "2026-11-27",
+    "url": "works/004/"
+  },
+  {
+    "id": "005",
+    "title": "Анімація логотипа",
+    "categoryId": "effects",
+    "tags": ["HTML", "CSS", "JavaScript", "Canvas", "Animation", "Particles", "Base64"],
+    "addedAt": "2026-11-27",
+    "url": "works/005/"
+  },
+  {
+    "id": "006",
+    "title": "Matrix Explosion",
+    "categoryId": "effects",
+    "tags": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Canvas",
+      "Matrix",
+      "Particles",
+      "Animation"
+    ],
+    "addedAt": "2026-11-27",
+    "url": "works/006/"
+  },
+  {
+    "id": "007",
+    "title": "Сонячна система 3D",
+    "categoryId": "experiments",
+    "tags": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Three.js",
+      "WebGL",
+      "3D",
+      "Анімація",
+      "Сонячна система",
+      "Планети",
+      "Космос"
+    ],
+    "addedAt": "2026-11-27",
+    "url": "works/007/"
+  },
+  {
+    "id": "008",
+    "title": "Неонові стільники",
+    "categoryId": "experiments",
+    "tags": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Canvas",
+      "2D",
+      "Шестикутна сітка",
+      "Анімація",
+      "Інтерактивність"
+    ],
+    "addedAt": "2026-11-27",
+    "url": "works/008/"
+  },
+  {
+    "id": "009",
+    "title": "Електричний лабіринт",
+    "categoryId": "experiments",
+    "tags": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "Canvas",
+      "2D",
+      "Maze",
+      "Particles",
+      "Electricity",
+      "Animation",
+      "Interactive"
+    ],
+    "addedAt": "2026-11-27",
+    "url": "works/009/"
+  }
+]

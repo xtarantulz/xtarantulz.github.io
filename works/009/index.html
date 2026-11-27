@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#000000">
+  <meta name="description" content="Інтерактивний електричний лабіринт із неоновими лініями та енергетичними імпульсами на Canvas 2D.">
+
+  <title>Електричний лабіринт | Canvas</title>
+
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="siteHeader"></div>
+
+<main class="electric-maze-page" data-preview-content>
+
+  <canvas id="mazeCanvas"></canvas>
+
+  <section class="maze-content" data-preview-hide>
+    <span class="section-label">CANVAS EXPERIMENT #009</span>
+
+    <h1>Електричний <span>лабіринт.</span></h1>
+
+    <p>
+      Геометрія енергії. Спостерігай за електричними
+      імпульсами, що прокладають шлях крізь неоновий лабіринт.
+    </p>
+  </section>
+
+  <div class="maze-controls" data-preview-hide>
+    <button id="toggleAnimation" type="button">
+      Призупинити
+    </button>
+
+    <button id="resetAnimation" type="button">
+      Новий лабіринт
+    </button>
+  </div>
+
+  <div class="maze-hint" data-preview-hide>
+    Натисни на лабіринт, щоб створити електричний імпульс
+  </div>
+
+</main>
+
+<div id="siteFooter"></div>
+
+<script src="../../assets/js/layout.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

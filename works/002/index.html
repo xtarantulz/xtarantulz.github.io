@@ -1,0 +1,76 @@
+
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0c10">
+  <meta name="description" content="Інтерактивна демонстрація пошуку шляху роботом у випадково згенерованому лабіринті.">
+  <title>Робот шукає шлях | Canvas</title>
+
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="siteHeader"></div>
+
+<main class="page" data-preview-content>
+  <section class="demo">
+    <div class="demo-heading" data-preview-hide>
+      <span class="section-label">INTERACTIVE EXPERIMENT #002</span>
+      <h1>Робот шукає <span>шлях.</span></h1>
+      <p>
+        Допоможи роботу знайти дорогу через лабіринт.
+        Він самостійно досліджує клітинки та шукає вихід.
+      </p>
+    </div>
+
+    <div class="maze-panel">
+      <div class="panel-header" data-preview-hide>
+        <div class="legend">
+          <span><i class="legend-start"></i> Старт</span>
+          <span><i class="legend-finish"></i> Фініш</span>
+          <span><i class="legend-wall"></i> Перешкода</span>
+          <span><i class="legend-path"></i> Шлях</span>
+        </div>
+
+        <span class="maze-size">15 × 25</span>
+      </div>
+
+      <div class="grid-container">
+        <table id="grid" aria-label="Лабіринт робота"></table>
+      </div>
+
+      <div class="panel-footer" data-preview-hide>
+        <p id="status" aria-live="polite">
+          Робот готується до пошуку...
+        </p>
+
+        <button id="restartButton" type="button">
+          <span>↻</span> Новий лабіринт
+        </button>
+      </div>
+    </div>
+
+    <div class="description" data-preview-hide>
+      <span class="description-icon">⌘</span>
+      <div>
+        <strong>Як це працює?</strong>
+        <p>
+          Лабіринт генерується випадково. Робот використовує
+          алгоритм пошуку в глибину (DFS), щоб знайти шлях
+          від початкової до кінцевої точки.
+        </p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="siteFooter"></div>
+
+<script src="../../assets/js/layout.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>

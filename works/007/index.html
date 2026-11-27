@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050711">
+  <meta name="description" content="Інтерактивна 3D-модель Сонячної системи з планетами, орбітами та супутниками.">
+
+  <title>3D Solar System | Canvas</title>
+
+  <link rel="stylesheet" href="../../assets/css/layout.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="siteHeader"></div>
+
+<div class="solar-scene" data-preview-content>
+  <div class="scene-title" data-preview-hide>
+    <span class="section-label">INTERACTIVE 3D EXPERIENCE</span>
+    <h1>Solar <span>System</span></h1>
+    <p>Досліджуй нашу Сонячну систему</p>
+  </div>
+
+  <div class="scene-hint" data-preview-hide>
+    <span>Перетягуй для обертання</span>
+    <span>Колесо миші для масштабування</span>
+  </div>
+
+  <div class="planet-info" id="planetInfo" data-preview-hide>
+    <span class="info-label">PLANET</span>
+    <h2 id="planetName">Земля</h2>
+    <p id="planetDescription">Третя планета від Сонця</p>
+    <div class="info-details">
+      <span id="planetDistance">149,6 млн км</span>
+      <span id="planetPeriod">365 днів</span>
+    </div>
+  </div>
+
+  <div class="scene-controls" data-preview-hide>
+    <button id="resetView" type="button">Скинути камеру</button>
+    <button id="toggleAnimation" type="button">Призупинити</button>
+  </div>
+
+  <div class="planet-list" id="planetList" data-preview-hide>
+    <button data-planet="sun" class="active">Сонце</button>
+    <button data-planet="mercury">Меркурій</button>
+    <button data-planet="venus">Венера</button>
+    <button data-planet="earth">Земля</button>
+    <button data-planet="mars">Марс</button>
+    <button data-planet="jupiter">Юпітер</button>
+    <button data-planet="saturn">Сатурн</button>
+    <button data-planet="uranus">Уран</button>
+    <button data-planet="neptune">Нептун</button>
+  </div>
+
+  <div id="solarCanvas"></div>
+</div>
+
+<div id="siteFooter"></div>
+
+<script src="../../assets/js/layout.js"></script>
+
+<script type="importmap">
+{
+    "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"
+    }
+}
+</script>
+
+<script type="module" src="script.js"></script>
+
+</body>
+</html>

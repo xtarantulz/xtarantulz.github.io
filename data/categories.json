@@ -1,0 +1,26 @@
+[
+  {
+    "id": "backgrounds",
+    "title": "Фони"
+  },
+  {
+    "id": "effects",
+    "title": "Ефекти та анімації"
+  },
+  {
+    "id": "tools",
+    "title": "Інструменти"
+  },
+  {
+    "id": "experiments",
+    "title": "Експерименти"
+  },
+  {
+    "id": "interfaces",
+    "title": "Інтерфейси"
+  },
+  {
+    "id": "games",
+    "title": "Ігри"
+  }
+]

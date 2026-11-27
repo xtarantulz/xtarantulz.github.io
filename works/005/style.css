@@ -1,0 +1,97 @@
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    overflow: hidden;
+    background: #000;
+    color: #f2f2f7;
+    font-family: 'DM Sans', sans-serif;
+}
+
+#canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.logo {
+    display: none;
+}
+
+#siteHeader,
+#siteFooter {
+    position: relative;
+    z-index: 2;
+}
+
+.animation-page {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    min-height: calc(100vh - 140px);
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    pointer-events: none;
+}
+
+.animation-content {
+    max-width: 600px;
+    text-align: center;
+}
+
+.section-label {
+    color: #ff7b02;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.animation-content h1 {
+    margin: 18px 0 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(42px, 7vw, 76px);
+    line-height: 1;
+    letter-spacing: -3px;
+}
+
+.animation-content h1 span {
+    color: #ff7b02;
+}
+
+.animation-content p {
+    max-width: 470px;
+    margin: 0 auto;
+    color: #a0a0ad;
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+    .animation-page {
+        min-height: calc(100vh - 140px);
+    }
+
+    .animation-content h1 {
+        letter-spacing: -2px;
+    }
+
+    .animation-content p {
+        font-size: 13px;
+    }
+}
+.preview-mode .animation-page {
+    display: none !important;
+}
+
