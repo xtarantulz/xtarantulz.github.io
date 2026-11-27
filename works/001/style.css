@@ -59,18 +59,27 @@ h1 {
 }
 
 #musicButton {
-    position: relative;
-    z-index: 10;
-    display: block;
-    margin: 20px auto 0;
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0;
     padding: 12px 24px;
     border: 1px solid rgba(255, 123, 2, 0.7);
     border-radius: 30px;
     background: rgba(8, 11, 18, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: #ffffff;
     font-family: inherit;
     font-size: 14px;
     font-weight: 600;
+    white-space: nowrap;
     cursor: pointer;
     pointer-events: auto;
     transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
@@ -79,16 +88,21 @@ h1 {
 #musicButton:hover {
     background: #ff7b02;
     border-color: #ff7b02;
-    transform: translateY(-2px);
+    transform: translate(-50%, -2px);
 }
 
 #musicButton:active {
-    transform: translateY(0);
+    transform: translate(-50%, 0);
 }
 
 #musicButton:focus-visible {
     outline: 2px solid #ffffff;
     outline-offset: 4px;
+}
+
+/* Ховаємо візуально у прев'ю каталогу, але залишаємо в DOM, щоб audio.js не видавав помилку */
+html.preview-mode #musicButton {
+    display: none;
 }
 
 @media (max-width: 600px) {
