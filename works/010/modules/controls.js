@@ -17,12 +17,6 @@ const touchState = {
 
 let initialized = false;
 
-function triggerHaptic(pattern) {
-    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-        navigator.vibrate(pattern);
-    }
-}
-
 export function initControls() {
     if (initialized) return;
 
@@ -88,9 +82,6 @@ function initTouchControls() {
             dpad.setPointerCapture(e.pointerId);
 
             const dir = resolveDirection(e.clientX, e.clientY);
-            if (dir) {
-                triggerHaptic(12);
-            }
             touchState.direction = dir;
             updateDpadVisual(dir);
         });
@@ -101,9 +92,6 @@ function initTouchControls() {
 
             const dir = resolveDirection(e.clientX, e.clientY);
             if (touchState.direction !== dir) {
-                if (dir) {
-                    triggerHaptic(10);
-                }
                 touchState.direction = dir;
                 updateDpadVisual(dir);
             }
@@ -126,7 +114,6 @@ function initTouchControls() {
             fireBtn.setPointerCapture(e.pointerId);
             touchState.fire = true;
             fireBtn.classList.add('is-pressed');
-            triggerHaptic(25);
         });
 
         const releaseFire = (e) => {
@@ -142,7 +129,6 @@ function initTouchControls() {
     if (pauseBtn) {
         pauseBtn.addEventListener('pointerdown', (e) => {
             e.preventDefault();
-            triggerHaptic();
             const startButton = document.getElementById('start-button');
             if (startButton) {
                 startButton.click();

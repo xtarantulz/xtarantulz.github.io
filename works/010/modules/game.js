@@ -1,7 +1,7 @@
-import {CONFIG} from './config.js';
-import {renderMap} from './renderer.js';
-import {generateNewLevel} from './map.js';
-import {events} from './events.js';
+import { CONFIG } from './config.js';
+import { renderMap } from './renderer.js';
+import { generateNewLevel } from './map.js';
+import { events } from './events.js';
 import './sounds.js';
 
 import {
@@ -56,12 +56,6 @@ let stats = {
     enemies: CONFIG.enemies.total,
     score: 0
 };
-
-function vibrate(pattern) {
-    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-        navigator.vibrate(pattern);
-    }
-}
 
 export function initGame(options) {
     canvas = options.canvas;
@@ -123,7 +117,6 @@ export function startGame() {
     lastFrameTime = 0;
 
     updateStartButton();
-    vibrate(25);
 
     events.emit('game:start');
 
@@ -165,7 +158,7 @@ export function getGameState() {
 }
 
 export function getStats() {
-    return {...stats};
+    return { ...stats };
 }
 
 function gameLoop(timestamp) {
@@ -238,7 +231,6 @@ function startNextLevel() {
     stats.enemies = CONFIG.enemies.total;
 
     updateStats();
-    vibrate([30, 40, 50]);
 
     events.emit('level:start', stats.level);
 }
@@ -255,8 +247,6 @@ function handlePlayerHit() {
         player.y + player.height / 2,
         'large'
     );
-
-    vibrate([90, 40, 120]);
 
     stats.lives--;
     clearBullets();
@@ -286,7 +276,6 @@ function handleEnemyHit(enemy, bullet) {
     enemy.health = Math.max(0, (enemy.health ?? 1) - 1);
 
     if (enemy.health > 0) {
-        vibrate(18);
         return;
     }
 
@@ -297,8 +286,6 @@ function handleEnemyHit(enemy, bullet) {
         enemy.y + enemy.height / 2,
         isArmored ? 'large' : undefined
     );
-
-    vibrate(isArmored ? [55, 30, 70] : 40);
 
     enemies.splice(index, 1);
 
@@ -319,10 +306,6 @@ function endGame(result) {
     if (gameState === 'over') return;
 
     gameState = 'over';
-
-    if (result !== 'victory') {
-        vibrate([150, 50, 150, 50, 220]);
-    }
 
     updateStartButton();
 
@@ -484,11 +467,9 @@ function updateStats() {
     if (livesElement) {
         livesElement.textContent = String(stats.lives).padStart(2, '0');
     }
-
     if (enemiesElement) {
         enemiesElement.textContent = String(stats.enemies).padStart(2, '0');
     }
-
     if (scoreElement) {
         scoreElement.textContent = String(stats.score).padStart(5, '0');
     }
