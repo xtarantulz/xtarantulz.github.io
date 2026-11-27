@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Класична гра Танчики у стилі Battle City для Dendy.">
+
+    <title>Танчики | Canvas</title>
+
+    <link rel="stylesheet" href="../../assets/css/layout.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="siteHeader"></div>
+<main class="game" data-preview-content>
+    <div class="game__container">
+        <div class="game__screen">
+            <canvas id="game" width="416" height="416"></canvas>
+        </div>
+
+        <aside class="game__sidebar" data-preview-hide>
+            <div class="game__logo">
+                <span>BATTLE</span>
+                <span>CITY</span>
+                <span class="game__by">by</span>
+                <span class="game__author">xTaRaNTuLz</span>
+            </div>
+
+            <div class="game__info">
+                <div class="game__info-item">
+                    <span>Рівень</span>
+                    <strong id="level">01</strong>
+                </div>
+
+                <div class="game__info-item">
+                    <span>Гравець</span>
+                    <strong id="lives">03</strong>
+                </div>
+
+                <div class="game__info-item">
+                    <span>Вороги</span>
+                    <strong id="enemies">20</strong>
+                </div>
+
+                <div class="game__info-item">
+                    <span>Рахунок</span>
+                    <strong id="score">00000</strong>
+                </div>
+            </div>
+
+            <div class="game__controls">
+                <h2>Керування</h2>
+                <p><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> Рух</p>
+                <p><kbd>Space</kbd> Постріл</p>
+                <p><kbd>Enter</kbd> Пауза</p>
+            </div>
+
+            <button class="game__start" id="start-button" type="button">
+                Почати гру
+            </button>
+        </aside>
+    </div>
+</main>
+
+<div id="siteFooter"></div>
+
+<script src="../../assets/js/layout.js"></script>
+<script type="module" src="script.js"></script>
+
+</body>
+</html>

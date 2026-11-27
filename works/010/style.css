@@ -1,0 +1,330 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+:root {
+    --bg: #080808;
+    --panel: #151515;
+    --panel-light: #202020;
+    --border: #343434;
+    --text: #f0f0f0;
+    --muted: #888888;
+    --accent: #ff7b02;
+    --screen: #000000;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    margin: 0;
+}
+
+body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    background:
+            radial-gradient(circle at 50% 45%, #1b1b1b 0%, #0d0d0d 45%, #050505 100%);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+}
+
+button {
+    font: inherit;
+}
+
+.game {
+    width: 100%;
+    min-height: calc(100vh - 140px);
+    min-height: calc(100dvh - 140px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 16px;
+}
+
+.game__container {
+    width: 100%;
+    max-width: 1100px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 220px;
+    gap: 24px;
+    align-items: center;
+    padding: 14px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow:
+            0 20px 60px rgba(0, 0, 0, 0.5),
+            inset 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.game__screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    padding: 8px;
+    background: #050505;
+    border: 2px solid #444;
+    border-radius: 5px;
+    box-shadow:
+            inset 0 0 0 2px #111,
+            0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+#game {
+    display: block;
+    width: 100%;
+    max-width: 670px;
+    height: auto;
+    aspect-ratio: 1;
+    background: var(--screen);
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.game__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding: 12px 4px;
+}
+
+.game__logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    padding: 20px 10px;
+    background: #0b0b0b;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--accent);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 19px;
+    line-height: 1.5;
+    text-align: center;
+    text-shadow: 1px 1px 0 #713500;
+}
+
+.game__by {
+    margin-top: 5px;
+    color: #888;
+    font-size: 9px;
+    line-height: 1.5;
+    text-shadow: none;
+}
+
+.game__author {
+    color: #f0f0f0;
+    font-size: 10px;
+    line-height: 1.5;
+    text-shadow: 1px 1px 0 #713500;
+}
+
+.game__info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.game__info-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px;
+    background: var(--panel-light);
+    border: 1px solid #303030;
+    border-radius: 4px;
+}
+
+.game__info-item span {
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.game__info-item strong {
+    color: var(--accent);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+}
+
+.game__controls {
+    padding: 14px;
+    background: #101010;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+}
+
+.game__controls h2 {
+    margin: 0 0 16px;
+    color: var(--accent);
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+.game__controls p {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 10px 0 0;
+    color: #bdbdbd;
+    font-size: 11px;
+}
+
+.game__controls kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 23px;
+    min-height: 23px;
+    padding: 4px;
+    background: #292929;
+    border: 1px solid #454545;
+    border-radius: 3px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.game__start {
+    width: 100%;
+    min-height: 46px;
+    margin-top: auto;
+    padding: 12px;
+    background: var(--accent);
+    border: 0;
+    border-radius: 4px;
+    color: #111;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    line-height: 1.6;
+    cursor: pointer;
+    transition:
+            background 0.2s ease,
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+}
+
+.game__start:hover {
+    background: #ff922e;
+    box-shadow: 0 0 20px rgba(255, 123, 2, 0.2);
+}
+
+.game__start:active {
+    transform: scale(0.97);
+}
+
+.game__start:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+/* Адаптивність */
+
+@media (max-width: 900px) {
+    .game__container {
+        grid-template-columns: minmax(0, 1fr) 200px;
+        gap: 16px;
+    }
+
+    #game {
+        max-width: 600px;
+    }
+}
+
+@media (max-width: 700px) {
+    .game {
+        align-items: flex-start;
+        padding: 15px 10px;
+    }
+
+    .game__container {
+        max-width: 600px;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        padding: 10px;
+    }
+
+    #game {
+        max-width: 560px;
+    }
+
+    .game__sidebar {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        padding: 4px;
+    }
+
+    .game__logo {
+        grid-column: 1 / -1;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .game__info {
+        gap: 6px;
+    }
+
+    .game__info-item {
+        padding: 9px;
+    }
+
+    .game__controls {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .game__controls h2 {
+        font-size: 9px;
+        margin-bottom: 8px;
+    }
+
+    .game__controls p {
+        margin-top: 6px;
+        font-size: 10px;
+    }
+
+    .game__start {
+        grid-column: 1 / -1;
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 380px) {
+    .game__sidebar {
+        grid-template-columns: 1fr;
+    }
+
+    .game__controls {
+        min-height: 130px;
+    }
+
+    .game__start {
+        grid-column: auto;
+    }
+
+    .game__info-item strong {
+        font-size: 10px;
+    }
+}
+
+.game__credit {
+    margin: 10px 0 0;
+    color: #777;
+    font-size: 12px;
+    text-align: center;
+}

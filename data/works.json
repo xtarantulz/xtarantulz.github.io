@@ -70,5 +70,14 @@
     "tags": ["HTML", "CSS", "JavaScript", "Canvas", "2D", "Maze", "Particles", "Electricity", "Animation", "Interactive"],
     "addedAt": "2026-11-27",
     "url": "works/009/"
+  },
+
+  {
+    "id": "010",
+    "title": "Танчики",
+    "categoryId": "games",
+    "tags": ["HTML", "CSS", "JavaScript", "Canvas", "Game", "Battle City", "Dendy"],
+    "addedAt": "2026-11-27",
+    "url": "works/010/"
   }
 ]
