@@ -1,4 +1,3 @@
-
 $(function () {
   const $grid = $('#worksGrid');
   const $category = $('#categoryFilter');
@@ -13,7 +12,11 @@ $(function () {
 
   $.getJSON('data/works.json')
       .done(function (worksData) {
-        works = Array.isArray(worksData) ? worksData : [];
+        works = (Array.isArray(worksData) ? worksData : []).sort((a, b) => {
+          const dateDiff = new Date(b.addedAt || 0) - new Date(a.addedAt || 0);
+          if (dateDiff !== 0) return dateDiff;
+          return String(b.id).localeCompare(String(a.id), undefined, { numeric: true });
+        });
 
         $.getJSON('data/categories.json')
             .done(function (categoriesData) {
