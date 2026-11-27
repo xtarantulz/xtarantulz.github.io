@@ -6,6 +6,7 @@ import { isTankOnForest } from './map.js';
 import { events } from './events.js';
 
 const PLAYER_SIZE = 14;
+const RESPAWN_INVULNERABILITY = 3000;
 
 let player = null;
 let playerOnForest = false;
@@ -27,7 +28,9 @@ export function createPlayer() {
         height: PLAYER_SIZE,
         direction: 'up',
         speed: CONFIG.player.speed,
-        isMoving: false
+        isMoving: false,
+        invulnerable: false,
+        invulnerabilityTime: 0
     };
 
     return player;
@@ -35,6 +38,24 @@ export function createPlayer() {
 
 export function getPlayer() {
     return player;
+}
+
+export function activatePlayerRespawn() {
+    if (!player) return;
+
+    player.invulnerable = true;
+    player.invulnerabilityTime = RESPAWN_INVULNERABILITY;
+}
+
+export function updatePlayer(deltaTime) {
+    if (!player?.invulnerable) return;
+
+    player.invulnerabilityTime -= deltaTime;
+
+    if (player.invulnerabilityTime <= 0) {
+        player.invulnerabilityTime = 0;
+        player.invulnerable = false;
+    }
 }
 
 export function movePlayer(direction, deltaTime, enemies = []) {
@@ -126,9 +147,24 @@ export function stopPlayer() {
 export function drawPlayer(ctx, timestamp = 0) {
     if (!player) return;
 
-    const { x, y, width, height, direction, isMoving } = player;
+    const {
+        x,
+        y,
+        width,
+        height,
+        direction,
+        isMoving,
+        invulnerable
+    } = player;
 
     ctx.save();
+
+    // Мигання під час тимчасової невразливості
+    if (invulnerable && Math.floor(timestamp / 120) % 2 === 0) {
+        ctx.restore();
+        return;
+    }
+
     ctx.translate(x + width / 2, y + height / 2);
 
     const rotations = {

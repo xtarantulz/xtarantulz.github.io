@@ -9,7 +9,9 @@ import {
     createPlayer,
     movePlayer,
     stopPlayer,
-    getPlayer
+    getPlayer,
+    activatePlayerRespawn,
+    updatePlayer
 } from './player.js';
 
 import {
@@ -181,6 +183,8 @@ function gameLoop(timestamp) {
 function update(deltaTime) {
     const input = getInput();
 
+    updatePlayer(deltaTime);
+
     if (input.direction) {
         movePlayer(input.direction, deltaTime, getEnemies());
     } else {
@@ -237,13 +241,13 @@ function handlePlayerHit() {
 
     const player = getPlayer();
 
-    if (player) {
-        createExplosion(
-            player.x + player.width / 2,
-            player.y + player.height / 2,
-            'large'
-        );
-    }
+    if (!player || player.invulnerable) return;
+
+    createExplosion(
+        player.x + player.width / 2,
+        player.y + player.height / 2,
+        'large'
+    );
 
     stats.lives--;
     clearBullets();
@@ -255,10 +259,14 @@ function handlePlayerHit() {
     }
 
     createPlayer();
+    activatePlayerRespawn();
+
+    events.emit('player:respawn');
+
     updateStats();
 }
 
-function handleEnemyHit(enemy) {
+function handleEnemyHit(enemy, bullet) {
     if (gameState !== 'playing') return;
 
     const enemies = getEnemies();
@@ -266,15 +274,22 @@ function handleEnemyHit(enemy) {
 
     if (index === -1) return;
 
+    enemy.health = Math.max(0, (enemy.health ?? 1) - 1);
+
+    if (enemy.health > 0) {
+        return;
+    }
+
     createExplosion(
         enemy.x + enemy.width / 2,
-        enemy.y + enemy.height / 2
+        enemy.y + enemy.height / 2,
+        enemy.type === 'armored' ? 'large' : undefined
     );
 
     enemies.splice(index, 1);
 
     enemiesDefeated++;
-    stats.score += 100;
+    stats.score += enemy.score ?? 100;
     stats.enemies = CONFIG.enemies.total - enemiesDefeated;
 
     updateStats();
@@ -307,11 +322,9 @@ function endGame(result) {
 function drawGameOver(result) {
     ctx.save();
 
-    // Затемнення ігрового поля
     ctx.fillStyle = 'rgba(0, 0, 0, 0.82)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Центральна панель
     const panelWidth = 360;
     const panelHeight = 150;
     const panelX = (canvas.width - panelWidth) / 2;
@@ -327,7 +340,6 @@ function drawGameOver(result) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
 
-    // Головний напис
     const title = result === 'victory'
         ? 'ПЕРЕМОГА!'
         : 'ГРУ ЗАВЕРШЕНО';
@@ -340,7 +352,6 @@ function drawGameOver(result) {
     ctx.fillStyle = result === 'victory' ? '#ffcc00' : '#ff5555';
     ctx.fillText(title, canvas.width / 2, panelY + 43);
 
-    // Причина завершення
     let message = 'УСІ ВОРОГИ ЗНИЩЕНІ';
 
     if (result === 'headquarters') {

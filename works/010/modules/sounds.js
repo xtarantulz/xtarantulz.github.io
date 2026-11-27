@@ -53,6 +53,43 @@ function createNoiseBuffer(audio, duration) {
     return buffer;
 }
 
+function playRespawn() {
+    if (!gameActive || gamePaused) return;
+
+    const audio = getAudioContext();
+
+    if (!audio) return;
+
+    const now = audio.currentTime;
+
+    // Коротка мелодія відновлення
+    const notes = [
+        { frequency: 523.25, start: 0, duration: 0.16 },
+        { frequency: 659.25, start: 0.15, duration: 0.16 },
+        { frequency: 783.99, start: 0.30, duration: 0.20 },
+        { frequency: 1046.50, start: 0.48, duration: 0.32 }
+    ];
+
+    notes.forEach(note => {
+        const oscillator = audio.createOscillator();
+        const gain = audio.createGain();
+
+        oscillator.type = 'square';
+        oscillator.frequency.setValueAtTime(note.frequency, now + note.start);
+
+        gain.gain.setValueAtTime(0.0001, now + note.start);
+        gain.gain.exponentialRampToValueAtTime(0.16, now + note.start + 0.02);
+        gain.gain.setValueAtTime(0.16, now + note.start + note.duration - 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + note.start + note.duration);
+
+        oscillator.connect(gain);
+        gain.connect(audio.destination);
+
+        oscillator.start(now + note.start);
+        oscillator.stop(now + note.start + note.duration);
+    });
+}
+
 function playExplosion(size = 'normal') {
     if (!gameActive || gamePaused) return;
 
@@ -64,7 +101,6 @@ function playExplosion(size = 'normal') {
     const large = size === 'large';
     const duration = large ? 1.1 : 0.65;
 
-    // Низькочастотний удар
     const oscillator = audio.createOscillator();
     const oscillatorGain = audio.createGain();
 
@@ -82,7 +118,6 @@ function playExplosion(size = 'normal') {
     oscillator.start(now);
     oscillator.stop(now + duration);
 
-    // Шумова складова
     const noise = audio.createBufferSource();
     const filter = audio.createBiquadFilter();
     const noiseGain = audio.createGain();
@@ -115,7 +150,6 @@ function playHeadquartersExplosion() {
     const now = audio.currentTime;
     const duration = 2.2;
 
-    // Потужний низькочастотний вибух
     const oscillator = audio.createOscillator();
     const oscillatorGain = audio.createGain();
 
@@ -132,7 +166,6 @@ function playHeadquartersExplosion() {
     oscillator.start(now);
     oscillator.stop(now + duration);
 
-    // Глибокий гуркіт
     const noise = audio.createBufferSource();
     const filter = audio.createBiquadFilter();
     const noiseGain = audio.createGain();
@@ -153,7 +186,6 @@ function playHeadquartersExplosion() {
     noise.start(now);
     noise.stop(now + duration);
 
-    // Game over після завершення вибуху
     window.setTimeout(() => {
         if (headquartersDestroyed) {
             playSound(sounds.over);
@@ -171,7 +203,6 @@ function playBrickBreak() {
     const now = audio.currentTime;
     const duration = 0.32;
 
-    // Розсипання уламків
     const noise = audio.createBufferSource();
     const filter = audio.createBiquadFilter();
     const gain = audio.createGain();
@@ -193,7 +224,6 @@ function playBrickBreak() {
     noise.start(now);
     noise.stop(now + duration);
 
-    // Короткий звук удару
     const oscillator = audio.createOscillator();
     const oscillatorGain = audio.createGain();
 
@@ -220,7 +250,6 @@ function playSteelHit() {
 
     const now = audio.currentTime;
 
-    // Металевий удар
     const frequencies = [720, 1080, 1560];
 
     frequencies.forEach((frequency, index) => {
@@ -245,7 +274,6 @@ function playSteelHit() {
         oscillator.stop(now + 0.65);
     });
 
-    // Короткий дзвінкий удар
     const noise = audio.createBufferSource();
     const filter = audio.createBiquadFilter();
     const gain = audio.createGain();
@@ -461,7 +489,6 @@ function resumeSounds() {
     updateMovementSound();
 }
 
-// Підписка на ігрові події
 events.on('game:start', playGameStart);
 events.on('game:over', playGameOver);
 events.on('game:pause', pauseSounds);
@@ -471,6 +498,7 @@ events.on('player:move', () => setTankMoving(true));
 events.on('player:stop', () => setTankMoving(false));
 events.on('player:forest', setTankOnForest);
 events.on('player:shoot', playShoot);
+events.on('player:respawn', playRespawn);
 
 events.on('bullet:brick-hit', playBrickBreak);
 events.on('bullet:steel-hit', playSteelHit);
