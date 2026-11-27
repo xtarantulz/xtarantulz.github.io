@@ -366,31 +366,38 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // --- 5. Полумесяц и упряжка Санты ---
   function drawMoon() {
-    const moonX = width - (isMobile ? 95 : 170);
-    const moonY = isMobile ? 85 : 120;
+    const moonX = width / 2;
+    const moonY = (isMobile ? 85 : 120) + 30;
     const r = isMobile ? 35 : 54;
+
     ctx.save();
     ctx.shadowColor = 'rgba(255, 255, 255, 0.85)';
     ctx.shadowBlur = 24;
+
     const gradient = ctx.createLinearGradient(
         moonX - r, moonY - r,
         moonX + r * 0.6, moonY + r
     );
+
     gradient.addColorStop(0, '#ffffff');
     gradient.addColorStop(0.6, '#f4f7fc');
     gradient.addColorStop(1, '#dce3f0');
+
     ctx.fillStyle = gradient;
     ctx.beginPath();
     ctx.arc(moonX, moonY, r, Math.PI * 0.32, Math.PI * 1.68, false);
+
     ctx.bezierCurveTo(
         moonX - r * 0.35, moonY - r * 0.55,
         moonX - r * 0.35, moonY + r * 0.55,
         moonX + r * Math.cos(Math.PI * 0.32),
         moonY + r * Math.sin(Math.PI * 0.32)
     );
+
     ctx.closePath();
     ctx.fill();
     ctx.restore();
+
     return {x: moonX, y: moonY, radius: r};
   }
 
