@@ -3,6 +3,10 @@ const keys = {
     ArrowDown: false,
     ArrowLeft: false,
     ArrowRight: false,
+    KeyW: false,
+    KeyA: false,
+    KeyS: false,
+    KeyD: false,
     Space: false
 };
 
@@ -68,7 +72,7 @@ function initTouchControls() {
             const dy = clientY - cy;
 
             // Мертва зона у самому центрі хрестовини
-            if (Math.hypot(dx, dy) < 12) {
+            if (Math.hypot(dx, dy) < 14) {
                 return null;
             }
 
@@ -138,8 +142,11 @@ function initTouchControls() {
     if (pauseBtn) {
         pauseBtn.addEventListener('pointerdown', (e) => {
             e.preventDefault();
-            triggerHaptic([15, 30, 15]);
-            document.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter' }));
+            triggerHaptic();
+            const startButton = document.getElementById('start-button');
+            if (startButton) {
+                startButton.click();
+            }
         });
     }
 }
@@ -155,13 +162,13 @@ export function getInput() {
     let direction = touchState.direction;
 
     if (!direction) {
-        if (keys.ArrowUp) {
+        if (keys.ArrowUp || keys.KeyW) {
             direction = 'up';
-        } else if (keys.ArrowDown) {
+        } else if (keys.ArrowDown || keys.KeyS) {
             direction = 'down';
-        } else if (keys.ArrowLeft) {
+        } else if (keys.ArrowLeft || keys.KeyA) {
             direction = 'left';
-        } else if (keys.ArrowRight) {
+        } else if (keys.ArrowRight || keys.KeyD) {
             direction = 'right';
         }
     }

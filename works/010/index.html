@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -21,6 +22,7 @@
         </div>
 
         <!-- Мобільний геймпад -->
+        <!-- Мобільний геймпад -->
         <div class="mobile-gamepad" id="mobile-gamepad" data-preview-hide aria-label="Мобільне керування">
             <div class="dpad" id="touch-dpad">
                 <button class="dpad__btn dpad__btn--up" data-dir="up" type="button" aria-label="Вгору">▲</button>
@@ -31,7 +33,7 @@
             </div>
 
             <div class="gamepad-center">
-                <button class="gamepad-pill" id="touch-pause" type="button">PAUSE</button>
+                <button class="gamepad-pill is-start" id="touch-pause" type="button">START</button>
             </div>
 
             <div class="gamepad-actions">
@@ -73,7 +75,17 @@
 
             <div class="game__controls">
                 <h2>Керування</h2>
-                <p><kbd>↑</kbd> <kbd>↓</kbd> <kbd>←</kbd> <kbd>→</kbd> Рух</p>
+                <div class="game__controls-move">
+                    <div class="game__keys-stack">
+                        <span class="game__keys-row">
+                            <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>
+                        </span>
+                        <span class="game__keys-row">
+                            <kbd>↑</kbd> <kbd>←</kbd> <kbd>↓</kbd> <kbd>→</kbd>
+                        </span>
+                    </div>
+                    <span class="game__controls-label">Рух</span>
+                </div>
                 <p><kbd>Space</kbd> Постріл</p>
                 <p><kbd>Enter</kbd> Пауза</p>
             </div>

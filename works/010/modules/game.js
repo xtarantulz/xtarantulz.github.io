@@ -448,14 +448,26 @@ function handleKeyDown(event) {
 }
 
 function updateStartButton() {
-    if (!startButton) return;
+    const touchPauseBtn = document.getElementById('touch-pause');
 
     if (gameState === 'playing') {
-        startButton.textContent = 'Пауза';
+        if (startButton) startButton.textContent = 'Пауза';
+        if (touchPauseBtn) {
+            touchPauseBtn.textContent = 'PAUSE';
+            touchPauseBtn.classList.remove('is-start');
+        }
     } else if (gameState === 'paused') {
-        startButton.textContent = 'Продовжити';
+        if (startButton) startButton.textContent = 'Продовжити';
+        if (touchPauseBtn) {
+            touchPauseBtn.textContent = 'RESUME';
+            touchPauseBtn.classList.add('is-start');
+        }
     } else {
-        startButton.textContent = 'Почати гру';
+        if (startButton) startButton.textContent = 'Почати гру';
+        if (touchPauseBtn) {
+            touchPauseBtn.textContent = 'START';
+            touchPauseBtn.classList.add('is-start');
+        }
     }
 }
 
