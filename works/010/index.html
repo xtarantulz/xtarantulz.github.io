@@ -20,6 +20,27 @@
             <canvas id="game" width="416" height="416"></canvas>
         </div>
 
+        <!-- Мобільний геймпад -->
+        <div class="mobile-gamepad" id="mobile-gamepad" data-preview-hide aria-label="Мобільне керування">
+            <div class="dpad" id="touch-dpad">
+                <button class="dpad__btn dpad__btn--up" data-dir="up" type="button" aria-label="Вгору">▲</button>
+                <button class="dpad__btn dpad__btn--left" data-dir="left" type="button" aria-label="Вліво">◀</button>
+                <div class="dpad__center"></div>
+                <button class="dpad__btn dpad__btn--right" data-dir="right" type="button" aria-label="Вправо">▶</button>
+                <button class="dpad__btn dpad__btn--down" data-dir="down" type="button" aria-label="Вниз">▼</button>
+            </div>
+
+            <div class="gamepad-center">
+                <button class="gamepad-pill" id="touch-pause" type="button">PAUSE</button>
+            </div>
+
+            <div class="gamepad-actions">
+                <button class="fire-btn" id="touch-fire" type="button" aria-label="Постріл">
+                    <span>FIRE</span>
+                </button>
+            </div>
+        </div>
+
         <aside class="game__sidebar" data-preview-hide>
             <div class="game__logo">
                 <span>BATTLE</span>

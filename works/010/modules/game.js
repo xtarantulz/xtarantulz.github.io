@@ -1,8 +1,7 @@
-
-import { CONFIG } from './config.js';
-import { renderMap } from './renderer.js';
-import { generateNewLevel } from './map.js';
-import { events } from './events.js';
+import {CONFIG} from './config.js';
+import {renderMap} from './renderer.js';
+import {generateNewLevel} from './map.js';
+import {events} from './events.js';
 import './sounds.js';
 
 import {
@@ -57,6 +56,12 @@ let stats = {
     enemies: CONFIG.enemies.total,
     score: 0
 };
+
+function vibrate(pattern) {
+    if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+        navigator.vibrate(pattern);
+    }
+}
 
 export function initGame(options) {
     canvas = options.canvas;
@@ -118,6 +123,7 @@ export function startGame() {
     lastFrameTime = 0;
 
     updateStartButton();
+    vibrate(25);
 
     events.emit('game:start');
 
@@ -159,7 +165,7 @@ export function getGameState() {
 }
 
 export function getStats() {
-    return { ...stats };
+    return {...stats};
 }
 
 function gameLoop(timestamp) {
@@ -232,6 +238,7 @@ function startNextLevel() {
     stats.enemies = CONFIG.enemies.total;
 
     updateStats();
+    vibrate([30, 40, 50]);
 
     events.emit('level:start', stats.level);
 }
@@ -248,6 +255,8 @@ function handlePlayerHit() {
         player.y + player.height / 2,
         'large'
     );
+
+    vibrate([90, 40, 120]);
 
     stats.lives--;
     clearBullets();
@@ -277,14 +286,19 @@ function handleEnemyHit(enemy, bullet) {
     enemy.health = Math.max(0, (enemy.health ?? 1) - 1);
 
     if (enemy.health > 0) {
+        vibrate(18);
         return;
     }
+
+    const isArmored = enemy.type === 'armored';
 
     createExplosion(
         enemy.x + enemy.width / 2,
         enemy.y + enemy.height / 2,
-        enemy.type === 'armored' ? 'large' : undefined
+        isArmored ? 'large' : undefined
     );
+
+    vibrate(isArmored ? [55, 30, 70] : 40);
 
     enemies.splice(index, 1);
 
@@ -305,6 +319,10 @@ function endGame(result) {
     if (gameState === 'over') return;
 
     gameState = 'over';
+
+    if (result !== 'victory') {
+        vibrate([150, 50, 150, 50, 220]);
+    }
 
     updateStartButton();
 
@@ -409,6 +427,7 @@ function drawPauseScreen() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     ctx.fillStyle = '#ffcc00';
     ctx.font = 'bold 28px Arial, sans-serif';
     ctx.fillText('ПАУЗА', canvas.width / 2, canvas.height / 2);
@@ -417,24 +436,27 @@ function drawPauseScreen() {
 }
 
 function handleKeyDown(event) {
-    if (event.code !== 'Enter' || event.repeat) return;
+    if (event.code !== 'Enter') return;
 
     event.preventDefault();
 
-    startGame();
+    if (gameState === 'playing') {
+        pauseGame();
+    } else if (gameState === 'paused') {
+        resumeGame();
+    }
 }
 
 function updateStartButton() {
     if (!startButton) return;
 
-    const labels = {
-        ready: 'ПОЧАТИ ГРУ',
-        playing: 'ПАУЗА',
-        paused: 'ПРОДОВЖИТИ',
-        over: 'ПОЧАТИ ГРУ'
-    };
-
-    startButton.textContent = labels[gameState];
+    if (gameState === 'playing') {
+        startButton.textContent = 'Пауза';
+    } else if (gameState === 'paused') {
+        startButton.textContent = 'Продовжити';
+    } else {
+        startButton.textContent = 'Почати гру';
+    }
 }
 
 function updateStats() {
@@ -444,15 +466,15 @@ function updateStats() {
     const scoreElement = document.getElementById('score');
 
     if (levelElement) {
-        levelElement.textContent = stats.level;
+        levelElement.textContent = String(stats.level).padStart(2, '0');
     }
 
     if (livesElement) {
-        livesElement.textContent = stats.lives;
+        livesElement.textContent = String(stats.lives).padStart(2, '0');
     }
 
     if (enemiesElement) {
-        enemiesElement.textContent = stats.enemies;
+        enemiesElement.textContent = String(stats.enemies).padStart(2, '0');
     }
 
     if (scoreElement) {
