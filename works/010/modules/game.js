@@ -429,31 +429,43 @@ function handlePlayerHit() {
 
 function handleEnemyHit(enemy, bullet) {
     if (gameState !== 'playing') return;
+
     const enemies = getEnemies();
     const index = enemies.indexOf(enemy);
+
     if (index === -1) return;
+
+    // Якщо це миготливий бонусний танк — видаємо бонус при ПЕРШОМУ ж влучанні і знімаємо миготіння
+    if (enemy.isBonus === true && !enemy.bonusDropped) {
+        enemy.isBonus = false;
+        enemy.bonusDropped = true;
+        spawnBonus(true);
+    }
+
     enemy.health = Math.max(0, (enemy.health ?? 1) - 1);
-// Поки броньований танк не знищено повністю — бонус не випадає
+
     if (enemy.health > 0) {
         return;
     }
+
     const isArmored = enemy.type === 'armored';
+
     createExplosion(
         enemy.x + enemy.width / 2,
         enemy.y + enemy.height / 2,
         isArmored ? 'large' : undefined
     );
+
     enemies.splice(index, 1);
+
     enemiesDefeated++;
-// Тільки при повному знищенні миготливого бонусного танка з'являється 1 бонус
-    if (enemy.isBonus === true && !enemy.bonusDropped) {
-        enemy.bonusDropped = true;
-        spawnBonus(true);
-    }
+
     stats.score += enemy.score ?? 100;
     stats.enemies = Math.max(0, CONFIG.enemies.total - enemiesDefeated);
+
     updateStats();
 }
+
 function handleHeadquartersHit() {
     if (gameState !== 'playing') return;
     endGame('headquarters');
